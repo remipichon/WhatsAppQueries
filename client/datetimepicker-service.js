@@ -49,15 +49,16 @@ dateDto.find({}).observeChanges({
 			type: "startDate"
 		}).date;
 
-		var params = {};
-		params.betweenDate = {
+	
+		var statistique = new Statistiques();
+		statistique.betweenDate = {
 			"date.ISO": {
 				$gte: start,
 				$lt: end
 			}
 		};
 
-		drawHighcharts.call(params);
+		drawHighcharts(statistique);
 	}
 });
 

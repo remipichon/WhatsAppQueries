@@ -1,6 +1,4 @@
-drawUserBarChart = function(ref, betweenDate) {
-    this.betweenDate = this.betweenDate || infinityDate();
-    this.ref = this.ref || ref;
+drawUserBarChart = function(statistique) {
 
     console.info("drawUserBarChart");
     var $chart = $('#user-bar-chart');
@@ -13,7 +11,7 @@ drawUserBarChart = function(ref, betweenDate) {
             text: 'Messages and content per user'
         },
         xAxis: {
-            categories: getEnumName.call(this)
+            categories: statistique.getEnumName()
         },
         yAxis: [{
             min: 0,
@@ -42,13 +40,13 @@ drawUserBarChart = function(ref, betweenDate) {
         series: [{
             name: 'Messages send',
             color: 'rgba(165,170,217,1)',
-            data: _.values(getNumberMessagePerUser.call(this)),
+            data: _.values(statistique.getNumberMessagePerUser()),
             pointPadding: 0.3,
             pointPlacement: -0.2
         }, {
             name: 'Content typed',
             color: 'rgba(126,86,134,.9)',
-            data: _.values(getTotalContentPerUser.call(this)),
+            data: _.values(statistique.getTotalContentPerUser()),
             pointPadding: 0.4,
             pointPlacement: -0.2,
             yAxis: 1
@@ -57,9 +55,7 @@ drawUserBarChart = function(ref, betweenDate) {
 }
 
 
-drawContentUserPieChart = function(ref, betweenDate) {
-    this.betweenDate = this.betweenDate || infinityDate();
-    this.ref = this.ref || ref;
+drawContentUserPieChart = function(statistique) {
 
     console.info("drawContentUserPieChart");
     var $chart = $('#user-content-pie-chart');
@@ -93,7 +89,7 @@ drawContentUserPieChart = function(ref, betweenDate) {
         series: [{
             type: 'pie',
             name: 'Number caracteres sent',
-            data: _.map(statContentMessagePerUser.call(this), function(num, key) {
+            data: _.map(statistique.getStatContentMessagePerUser(), function(num, key) {
                 return [key, num];
             })
         }]
@@ -101,11 +97,9 @@ drawContentUserPieChart = function(ref, betweenDate) {
 }
 
 
-drawMessageUserPieChart = function(ref, betweenDate) {
-    this.betweenDate = this.betweenDate || infinityDate();
-    this.ref = this.ref || ref;
+drawMessageUserPieChart = function(statistique) {
 
-    console.info("drawMessageUserPieChart");
+    console.info("drawMessageUserPieChart",this.ref,this.betweenDate);
     var $chart = $('#user-message-pie-chart');
     if(typeof $chart.highcharts() !== "undefined") $chart.highcharts().destroy();
 
@@ -137,7 +131,7 @@ drawMessageUserPieChart = function(ref, betweenDate) {
         series: [{
             type: 'pie',
             name: 'Messages sent',
-            data: _.map(statNumberMessagePerUser.call(this), function(num, key) {
+            data: _.map(statistique.getStatNumberMessagePerUser(), function(num, key) {
                 return [key, num];
             })
         }]
@@ -145,14 +139,14 @@ drawMessageUserPieChart = function(ref, betweenDate) {
 }
 
 
-drawHighcharts = function(ref, betweenDate) {
+drawHighcharts = function(statistique) {
     console.debug("drawHighcharts avt",this.ref,this.betweenDate);
 
-    this.betweenDate = this.betweenDate || infinityDate();
-    this.ref = this.ref || ref;
-    console.debug("drawHighcharts",this.ref,this.betweenDate);
+    if(! statistique instanceof Statistiques ){
+        statistique = new Statistiques();
+    }
 
-    drawMessageUserPieChart.call(this);
-    drawContentUserPieChart.call(this);
-    drawUserBarChart.call(this);
+    drawMessageUserPieChart(statistique);
+    drawContentUserPieChart(statistique);
+    drawUserBarChart(statistique);
 }
