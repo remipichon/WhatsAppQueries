@@ -57,17 +57,24 @@ parseFile =  function(filename, conversationName, add) {
           minutes: row.substring(14, 16),
         };
         date.ISO = new Date(now.getFullYear(), month.indexOf(date.month),parseInt(date.day), parseInt(date.hour), parseInt(date.minutes),0, 0);
+        var hours = {
+          hour: date.hour,
+          minutes: date.minutes,
+        }
+        hours.ISO = new Date(1970, 1,1, parseInt(date.hour), parseInt(date.minutes),0, 0);       
+
 
         var header = row.split(":")[0] + row.split(":")[1];
         var userName = row.substring(19, header.length + 1);
         var content = row.substring(header.length + 3, row.length);
 
         //console.debug(row,"____",header);
-        console.debug(date, name);
+        console.debug(date, name,hours);
         console.debug(content);
 
         Data.insert({
           date: date,
+          hours: hours,
           userName: userName,
           content: content,
           reference: conversationName
@@ -81,10 +88,3 @@ parseFile =  function(filename, conversationName, add) {
 
 
 
-readDate = function(date){
-  return new Date(date.substring(0,4),
-    date.substring(5,7)-1,
-    date.substring(8,10),
-      date.substring(11,13),
-      date.substring(14,16),0,0);
-}

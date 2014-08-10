@@ -4,6 +4,7 @@ Data = new Meteor.Collection("data");
 Statistiques = function() {
 	this.ref = "sample.txt";
 	this.betweenDate = infinityDate();
+	this.betweenHours = infinityHours();
 
 	this.enumName = null;
 	this.numberMessagePerUser = null;
@@ -18,6 +19,7 @@ Statistiques = function() {
 
 		var betweenDate = this.betweenDate;
 		var ref = this.ref;
+		var betweenHours = this.betweenHours;
 
 		console.debug("getEnumName", this.ref, this.betweenDate);
 
@@ -26,7 +28,8 @@ Statistiques = function() {
 			$and: [{
 					reference: this.ref
 				},
-				this.betweenDate,
+				betweenDate,
+				betweenHours
 			],
 		}).fetch(), function(row) {
 
@@ -46,6 +49,7 @@ Statistiques = function() {
 		if (this.numberMessagePerUser !== null) return this.numberMessagePerUser;
 		var betweenDate = this.betweenDate;
 		var ref = this.ref;
+		var betweenHours = this.betweenHours;
 
 		var enumName = this.getEnumName();
 		var occurences = {};
@@ -56,7 +60,8 @@ Statistiques = function() {
 					}, {
 						reference: ref
 					},
-					betweenDate
+					betweenDate,
+					betweenHours
 				]
 			});
 			occurences[userName] = Data.find({
@@ -65,7 +70,8 @@ Statistiques = function() {
 					}, {
 						reference: ref
 					},
-					betweenDate
+					betweenDate,
+					betweenHours
 				]
 			}).fetch().length;
 
@@ -75,9 +81,10 @@ Statistiques = function() {
 	}
 
 	this.getTotalContentPerUser = function() {
-		if(this.totalContentPerUser !== null) return this.totalContentPerUser;
+		if (this.totalContentPerUser !== null) return this.totalContentPerUser;
 		var betweenDate = this.betweenDate;
 		var ref = this.ref;
+		var betweenHours = this.betweenHours;
 		console.debug("getTotalContentPerUser", this);
 
 		var enumName = this.getEnumName();
@@ -90,7 +97,8 @@ Statistiques = function() {
 					}, {
 						reference: ref
 					},
-					betweenDate
+					betweenDate,
+					betweenHours
 				]
 			}).fetch(), function(record) {
 				tot += record.content.length;
@@ -106,6 +114,7 @@ Statistiques = function() {
 		if (this.numberTotalMessage !== null) return this.numberTotalMessage
 		var betweenDate = this.betweenDate;
 		var ref = this.ref;
+		var betweenHours = this.betweenHours;
 
 		var ret = Data.find({
 			reference: ref
@@ -118,6 +127,7 @@ Statistiques = function() {
 		if (this.statNumberMessagePerUser !== null) return this.statNumberMessagePerUser;
 		var betweenDate = this.betweenDate;
 		var ref = this.ref;
+		var betweenHours = this.betweenHours;
 
 
 		var occurences = {};
@@ -136,6 +146,7 @@ Statistiques = function() {
 		if (this.statContentMessagePerUser !== null) return this.statContentMessagePerUser;
 		var betweenDate = this.betweenDate;
 		var ref = this.ref;
+		var betweenHours = this.betweenHours;
 
 		var occurences = {};
 		var enumName = this.getEnumName();
@@ -153,9 +164,6 @@ Statistiques = function() {
 
 	this.printStat = function() {
 
-		this.betweenDate = this.betweenDate || betweenDate
-		var ref = this.ref;
-
 		console.info("user ", this.getEnumName());
 		console.info("number message per user ", this.getNumberMessagePerUser());
 		console.info("total content per user ", this.getTotalContentPerUser());
@@ -170,3 +178,14 @@ Statistiques = function() {
 
 
 }
+
+// var temp = new Statistiques();
+// _.each(Object.getOwnPropertyNames(temp), function(property) {
+// 	if (typeof temp[property] === "function") {
+// 		//AOP
+// 		Statistiques[property]
+// 		console.infos("TRACE : ")
+// 	}
+// })
+
+// delete temp;
