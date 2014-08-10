@@ -9,7 +9,7 @@ infinityDate = function() {
 	};
 }
 
-getStateBetweenDate = function(start, end) {
+printStatsBetweenDate = function(start, end) {
 
 	start = start || new 1970(Date, 1, 1, 0, 0, 0, 0);
 	end = end || new Date();
@@ -21,7 +21,7 @@ getStateBetweenDate = function(start, end) {
 		}
 	};
 
-	getStat(ref, betweenDate);
+	new Statistique(betweenDate).printStat();
 
 }
 
@@ -50,7 +50,7 @@ dateDto.find({}).observeChanges({
 		}).date;
 
 	
-		var statistique = new Statistiques();
+		statistique = new Statistiques();
 		statistique.betweenDate = {
 			"date.ISO": {
 				$gte: start,

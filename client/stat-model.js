@@ -2,9 +2,7 @@ Data = new Meteor.Collection("data");
 
 
 Statistiques = function() {
-	//Statistiques
 	this.ref = "sample.txt";
-	//Statistiques
 	this.betweenDate = infinityDate();
 
 	this.enumName = null;
@@ -14,16 +12,12 @@ Statistiques = function() {
 	this.statNumberMessagePerUser = null;
 	this.statContentMessagePerUser = null;
 
-
-
-	ref = "sample.txt"; //TODO a virer
-	//Statistiques.prototype.
-	this.getEnumName = function(ref, betweenDate) {
-		if(this.enumName !== null) return this.enumName;
+	this.getEnumName = function() {
+		if (this.enumName !== null) return this.enumName;
 		console.debug("getEnumName avt", this.ref, this.betweenDate);
 
-		var betweenDate = this.betweenDate || betweenDate;
-		var ref = this.ref || ref;
+		var betweenDate = this.betweenDate;
+		var ref = this.ref;
 
 		console.debug("getEnumName", this.ref, this.betweenDate);
 
@@ -48,11 +42,10 @@ Statistiques = function() {
 		return ret;
 	};
 
-	//Statistiques.prototype.
-	this.getNumberMessagePerUser = function(ref, betweenDate) {
-		if(this.numberMessagePerUser !== null) return this.numberMessagePerUser;
-		var betweenDate = this.betweenDate || betweenDate
-		var ref = this.ref || ref;
+	this.getNumberMessagePerUser = function() {
+		if (this.numberMessagePerUser !== null) return this.numberMessagePerUser;
+		var betweenDate = this.betweenDate;
+		var ref = this.ref;
 
 		var enumName = this.getEnumName();
 		var occurences = {};
@@ -61,7 +54,7 @@ Statistiques = function() {
 				$and: [{
 						userName: userName
 					}, {
-						reference: this.ref
+						reference: ref
 					},
 					betweenDate
 				]
@@ -70,7 +63,7 @@ Statistiques = function() {
 				$and: [{
 						userName: userName
 					}, {
-						reference: this.ref
+						reference: ref
 					},
 					betweenDate
 				]
@@ -81,12 +74,11 @@ Statistiques = function() {
 		return occurences;
 	}
 
-	//Statistiques.prototype.
-	this.getTotalContentPerUser = function(ref, betweenDate) {
-		//if(this.totalConTentPeruser !== null) return this.totalContentPerUser;
-		var betweenDate = this.betweenDate || betweenDate;
-		var ref = this.ref || ref;
-		console.debug("getTotalContentPerUser",this);
+	this.getTotalContentPerUser = function() {
+		if(this.totalContentPerUser !== null) return this.totalContentPerUser;
+		var betweenDate = this.betweenDate;
+		var ref = this.ref;
+		console.debug("getTotalContentPerUser", this);
 
 		var enumName = this.getEnumName();
 		var occurences = {};
@@ -96,7 +88,7 @@ Statistiques = function() {
 				$and: [{
 						userName: userName
 					}, {
-						reference: this.ref
+						reference: ref
 					},
 					betweenDate
 				]
@@ -110,11 +102,10 @@ Statistiques = function() {
 		return occurences;
 	}
 
-	//Statistiques.prototype.
-	this.getNumberTotalMessage = function(ref, betweenDate) {
-		if(this.numberTotalMessage !== null) return this.numberTotalMessage
-		var betweenDate = this.betweenDate || betweenDate;
-		var ref = this.ref || ref;
+	this.getNumberTotalMessage = function() {
+		if (this.numberTotalMessage !== null) return this.numberTotalMessage
+		var betweenDate = this.betweenDate;
+		var ref = this.ref;
 
 		var ret = Data.find({
 			reference: ref
@@ -123,19 +114,17 @@ Statistiques = function() {
 		return ret;
 	}
 
-
-	//Statistiques.prototype.
-	this.getStatNumberMessagePerUser = function(ref, betweenDate) {
-		if(this.statNumberMessagePerUser !== null) return this.statNumberMessagePerUser;
-		var betweenDate = this.betweenDate || betweenDate;
-		var ref = this.ref || ref;
+	this.getStatNumberMessagePerUser = function() {
+		if (this.statNumberMessagePerUser !== null) return this.statNumberMessagePerUser;
+		var betweenDate = this.betweenDate;
+		var ref = this.ref;
 
 
 		var occurences = {};
 		var enumName = this.getEnumName();
 		var nbMsgPerUser = this.getNumberMessagePerUser();
 		var totalMessage = this.getNumberTotalMessage();
-		console.debug("getStatNumberMessagePerUser",nbMsgPerUser,totalMessage);
+		console.debug("getStatNumberMessagePerUser", nbMsgPerUser, totalMessage);
 		_.each(enumName, function(name) {
 			occurences[name] = nbMsgPerUser[name] / totalMessage;
 		});
@@ -143,11 +132,10 @@ Statistiques = function() {
 		return occurences;
 	}
 
-	//Statistiques.prototype.
-	this.getStatContentMessagePerUser = function(ref, betweenDate) {
-		if(this.statContentMessagePerUser !== null)return this.statContentMessagePerUser;
-		var betweenDate = this.betweenDate || betweenDate;
-		var ref = this.ref || ref;
+	this.getStatContentMessagePerUser = function() {
+		if (this.statContentMessagePerUser !== null) return this.statContentMessagePerUser;
+		var betweenDate = this.betweenDate;
+		var ref = this.ref;
 
 		var occurences = {};
 		var enumName = this.getEnumName();
@@ -163,11 +151,10 @@ Statistiques = function() {
 		return occurences;
 	}
 
-	//Statistiques.prototype.
-	this.printStat = function(ref, betweenDate) {
+	this.printStat = function() {
 
 		this.betweenDate = this.betweenDate || betweenDate
-		var ref = this.ref || ref;
+		var ref = this.ref;
 
 		console.info("user ", this.getEnumName());
 		console.info("number message per user ", this.getNumberMessagePerUser());
@@ -175,5 +162,11 @@ Statistiques = function() {
 		console.info("stat number message per user", this.getStatNumberMessagePerUser());
 		console.info("stat content message per user ", this.getStatContentMessagePerUser());
 	}
+
+
+	//AOP
+	//log input this
+	//log output result
+
 
 }
