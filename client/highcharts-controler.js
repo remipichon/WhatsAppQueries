@@ -1,6 +1,7 @@
-drawUserBarChart = function(statistique) {
+HighchartsService = function(){}
 
-    console.info("drawUserBarChart");
+HighchartsService.drawUserBarChart = function(statistique) {
+
     var $chart = $('#user-bar-chart');
     if(typeof $chart.highcharts() !== "undefined") $chart.highcharts().destroy();
     $chart.highcharts({
@@ -55,9 +56,8 @@ drawUserBarChart = function(statistique) {
 }
 
 
-drawContentUserPieChart = function(statistique) {
+HighchartsService.drawContentUserPieChart = function(statistique) {
 
-    console.info("drawContentUserPieChart");
     var $chart = $('#user-content-pie-chart');
     if(typeof $chart.highcharts() !== "undefined") $chart.highcharts().destroy();
 
@@ -97,9 +97,8 @@ drawContentUserPieChart = function(statistique) {
 }
 
 
-drawMessageUserPieChart = function(statistique) {
+HighchartsService.drawMessageUserPieChart = function(statistique) {
 
-    console.info("drawMessageUserPieChart",this.ref,this.betweenDate);
     var $chart = $('#user-message-pie-chart');
     if(typeof $chart.highcharts() !== "undefined") $chart.highcharts().destroy();
 
@@ -139,14 +138,58 @@ drawMessageUserPieChart = function(statistique) {
 }
 
 
-drawHighcharts = function(statistique) {
-    console.debug("drawHighcharts avt",this.ref,this.betweenDate);
+HighchartsService.drawHighcharts = function(statistique) {
 
     if(! statistique instanceof Statistiques ){
         statistique = new Statistiques();
     }
-
-    drawMessageUserPieChart(statistique);
-    drawContentUserPieChart(statistique);
-    drawUserBarChart(statistique);
+    HighchartsService.drawUserBarChart(statistique);
+    HighchartsService.drawMessageUserPieChart(statistique);
+    HighchartsService.drawContentUserPieChart(statistique);
 }
+
+
+HighchartsService.initDrawHighcharts = function() {
+
+    statistique = new Statistiques();
+
+    var endDate = datetimepicker.findOne({
+        type: "endDate"
+    }).date;
+    var startDate = datetimepicker.findOne({
+        type: "startDate"
+    }).date;
+    statistique.betweenDate = {
+        "date.ISO": {
+            $gte: startDate,
+            $lt: endDate
+        }
+    };
+
+    var endHours = datetimepicker.findOne({
+        type: "endHours"
+    }).hours;
+    var startHours = datetimepicker.findOne({
+        type: "startHours"
+    }).hours;
+    statistique.betweenHours = {
+        "hours.ISO": {
+            $gte: startHours,
+            $lt: endHours
+        }
+    };
+
+    HighchartsService.drawHighcharts(statistique);
+}
+
+// must be after adding methods to prototype
+Aop.around("", function(f) {
+        //arguments[0].arguments[0] += 10;      
+      console.log("TRACE : AOPbefore HighchartsService."+f.fnName,"called with", ((arguments[0].arguments.length == 0)? "no args":arguments[0].arguments) );
+      var retour = Aop.next(f); //mandatory
+      console.log("TRACE : AOPafter HighchartsService."+f.fnName,"which returned",retour);
+      return retour; //mandatory
+}, [ HighchartsService.prototype ]); 
+
+
+

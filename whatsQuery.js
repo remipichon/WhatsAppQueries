@@ -6,8 +6,6 @@ if (Meteor.isClient) {
   Template.hello.events({
     'click input': function () {
       // template data, if any, is available in 'this'
-      if (typeof console !== 'undefined')
-        console.log("You pressed the button");
     }
   });
 }
@@ -22,7 +20,6 @@ if (Meteor.isServer) {
 
 parseFile =  function(filename, conversationName, add) {
   if(typeof filename === "undefined"){
-      console.err("parseFile :  filename required");
       throw new Error("parseFile :  filename required");
 
     }
@@ -31,23 +28,21 @@ parseFile =  function(filename, conversationName, add) {
     var conversationName = conversationName || filename;
     var add = add || false;
 
-    console.log("parseFile", filename, conversationName, add);
 
 
     if (!add && Meteor.isServer) {
       Data.remove({
-        reference: name
+        reference: conversationName
       });
     }
 
     HTTP.get("http://192.168.1.54:3000/"+filename, function(err, result) {
 //       if ( err !== "undefined") {
 //         console.log("parseFile err : ", err);
-//         return err;
+//         return err;  
 //       }
 
       _.each(result.content.split("\n"), function(row) {
-        console.debug("row : ",row);
         if (row.length === 0) return;
         var now = new Date();
         date = {
@@ -68,9 +63,6 @@ parseFile =  function(filename, conversationName, add) {
         var userName = row.substring(19, header.length + 1);
         var content = row.substring(header.length + 3, row.length);
 
-        //console.debug(row,"____",header);
-        console.debug(date, name,hours);
-        console.debug(content);
 
         Data.insert({
           date: date,
@@ -80,8 +72,6 @@ parseFile =  function(filename, conversationName, add) {
           reference: conversationName
         });
       });
-
-      console.log("parseFile : ", filename, " has been parsed into ", name, "added : ", add);
 
     });
   }

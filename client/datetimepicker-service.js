@@ -1,4 +1,6 @@
-infinityDate = function() {
+DatetimePicker = function(){}
+
+DatetimePicker.infinityDate = function() {
 	start = new Date(1970, 1, 1, 0, 0, 0, 0);
 	end = new Date();
 	return {
@@ -9,7 +11,7 @@ infinityDate = function() {
 	};
 }
 
-infinityHours = function() {
+DatetimePicker.infinityHours = function() {
 	start = new Date(1970, 1, 1, 0, 0, 0, 0);
 	end = new Date(1970, 1, 1, 23, 59, 59, 999);
 	return {
@@ -36,6 +38,34 @@ printStatsBetweenDate = function(start, end) {
 	new Statistique(betweenDate).printStat();
 }
 
+DatetimePicker.readDate = function(date) {
+	return new Date(date.substring(0, 4),
+		date.substring(5, 7) - 1,
+		date.substring(8, 10),
+		date.substring(11, 13),
+		date.substring(14, 16), 0, 0);
+}
+
+DatetimePicker.readHour = function(date) {
+	return new Date(1970, 1, 1,
+		date.substring(0, 2),
+		date.substring(3, 5), 0, 0);
+}
+
+// must be after adding methods to prototype
+Aop.around("", function(f) {
+		//arguments[0].arguments[0] += 10;		
+	  console.log("TRACE : AOPbefore DatetimePicker."+f.fnName,"called with", ((arguments[0].arguments.length == 0)? "no args":arguments[0].arguments) );
+	  var retour = Aop.next(f); //mandatory
+	  console.log("TRACE : AOPafter DatetimePicker."+f.fnName,"which returned",retour);
+	  return retour; //mandatory
+}, [ DatetimePicker.prototype ]); 
+
+
+
+
+
+
 datetimepicker = new Meteor.Collection("dateTime", {
 	connection: null
 }); //local db
@@ -60,46 +90,25 @@ datetimepicker.insert({
 
 datetimepicker.find({}).observeChanges({
 	changed: function() {
+		var highcharts = new HighchartsService();
 
-		statistique = new Statistiques();
+		if (Data.find({}).fetch().length > 300) {
+			$("#draw-button").fadeIn(400);
+			return;
+		}
 
-		var endDate = datetimepicker.findOne({
-			type: "endDate"
-		}).date;
-		var startDate = datetimepicker.findOne({
-			type: "startDate"
-		}).date;
-		statistique.betweenDate = {
-			"date.ISO": {
-				$gte: startDate,
-				$lt: endDate
-			}
-		};
 
-		var endHours = datetimepicker.findOne({
-			type: "endHours"
-		}).hours;
-		var startHours = datetimepicker.findOne({
-			type: "startHours"
-		}).hours;
-		statistique.betweenHours = {
-			"hours.ISO": {
-				$gte: startHours,
-				$lt: endHours
-			}
-		};
+		highcharts.initDrawHighcharts();
 
-		drawHighcharts(statistique);
 	}
 });
-
 
 initDatePicker = function() {
 	jQuery('#date_timepicker_start').datetimepicker({
 		format: 'Y/m/d',
 		timepicker: false,
 		onChangeDateTime: function(dp, $input) {
-			startDate = readDate($input.val());
+			startDate = DatetimePicker.readDate($input.val());
 			datetimepicker.update(
 				datetimepicker.findOne({
 					type: "startDate"
@@ -120,7 +129,7 @@ initDatePicker = function() {
 		format: 'Y/m/d',
 		timepicker: false,
 		onChangeDateTime: function(dp, $input) {
-			endDate = readDate($input.val());
+			endDate = DatetimePicker.readDate($input.val());
 			datetimepicker.update(
 				datetimepicker.findOne({
 					type: "endDate"
@@ -145,7 +154,6 @@ initTimePicker = function() {
 		datepicker: false,
 		onChangeDateTime: function(dp, $input) {
 			start = readHour($input.val());
-			console.log("time.onChangeDateTime.startHour", start);
 			datetimepicker.update(
 				datetimepicker.findOne({
 					type: "startHours"
@@ -188,20 +196,8 @@ initTimePicker = function() {
 $(document).ready(function() {
 	initDatePicker();
 	initTimePicker();
+	$("#draw-button").on("click", HighchartsService.initDrawHighcharts);
 });
 
 
-readDate = function(date) {
-	return new Date(date.substring(0, 4),
-		date.substring(5, 7) - 1,
-		date.substring(8, 10),
-		date.substring(11, 13),
-		date.substring(14, 16), 0, 0);
-}
 
-readHour = function(date) {
-	// console.log("readHour",date)
-	return new Date(1970,1,1,
-		date.substring(0, 2),
-		date.substring(3,5), 0, 0);
-}

@@ -1,10 +1,20 @@
 Data = new Meteor.Collection("data");
 
+Object.size = function(obj) {
+	var size = 0,
+		key;
+	for (key in obj) {
+		if (obj.hasOwnProperty(key)) size++;
+	}
+	return size;
+};
 
-Statistiques = function() {
+
+function _Statistiques() {
 	this.ref = "sample.txt";
-	this.betweenDate = infinityDate();
-	this.betweenHours = infinityHours();
+	//this.ref = "spam_libre.txt";
+	this.betweenDate = DatetimePicker.infinityDate();
+	this.betweenHours = DatetimePicker.infinityHours();
 
 	this.enumName = null;
 	this.numberMessagePerUser = null;
@@ -13,15 +23,41 @@ Statistiques = function() {
 	this.statNumberMessagePerUser = null;
 	this.statContentMessagePerUser = null;
 
+	this.sorted;
+
+	//ce sort est pourri, implementer un quick sort serait bien mieux !
+	//sinon, sort les values puis reconstruire l'object à partir des values => probleme si deux values identiques
+	this.sortObject = function(ob) {
+		var temp = {};
+		var cont = true;
+		var nb = Object.size(ob)
+		console.debug("Statistiques.sortObject object.length", nb, ob);
+		while (nb !== 0) {
+			cont = true;
+			var min = 10000000;
+			var user;
+			_.each(ob, function(value, userName) {
+				if (value < min) {
+					min = value;
+					user = userName;
+				}
+			});
+			temp[user] = min;
+			delete ob[user];
+			nb--;
+		}
+
+		this.sorted = temp;
+		return temp;
+	}
+
 	this.getEnumName = function() {
 		if (this.enumName !== null) return this.enumName;
-		console.debug("getEnumName avt", this.ref, this.betweenDate);
 
 		var betweenDate = this.betweenDate;
 		var ref = this.ref;
 		var betweenHours = this.betweenHours;
 
-		console.debug("getEnumName", this.ref, this.betweenDate);
 
 		var names = [];
 		_.each(Data.find({
@@ -54,16 +90,7 @@ Statistiques = function() {
 		var enumName = this.getEnumName();
 		var occurences = {};
 		_.each(enumName, function(userName) {
-			console.debug({
-				$and: [{
-						userName: userName
-					}, {
-						reference: ref
-					},
-					betweenDate,
-					betweenHours
-				]
-			});
+
 			occurences[userName] = Data.find({
 				$and: [{
 						userName: userName
@@ -76,6 +103,9 @@ Statistiques = function() {
 			}).fetch().length;
 
 		});
+
+
+		occurences = this.sortObject(occurences);
 		this.numberMessagePerUser = occurences;
 		return occurences;
 	}
@@ -85,7 +115,6 @@ Statistiques = function() {
 		var betweenDate = this.betweenDate;
 		var ref = this.ref;
 		var betweenHours = this.betweenHours;
-		console.debug("getTotalContentPerUser", this);
 
 		var enumName = this.getEnumName();
 		var occurences = {};
@@ -106,6 +135,7 @@ Statistiques = function() {
 
 			occurences[userName] = tot;
 		});
+		occurences = this.sortObject(occurences);
 		this.totalContentPerUser = occurences;
 		return occurences;
 	}
@@ -134,10 +164,10 @@ Statistiques = function() {
 		var enumName = this.getEnumName();
 		var nbMsgPerUser = this.getNumberMessagePerUser();
 		var totalMessage = this.getNumberTotalMessage();
-		console.debug("getStatNumberMessagePerUser", nbMsgPerUser, totalMessage);
 		_.each(enumName, function(name) {
 			occurences[name] = nbMsgPerUser[name] / totalMessage;
 		});
+		occurences = this.sortObject(occurences);
 		this.statNumberMessagePerUser = occurences;
 		return occurences;
 	}
@@ -158,6 +188,7 @@ Statistiques = function() {
 		_.each(enumName, function(name) {
 			occurences[name] = contentPerUser[name] / totalMessageContent;
 		});
+		occurences = this.sortObject(occurences);
 		this.statContentMessagePerUser = occurences;
 		return occurences;
 	}
@@ -172,20 +203,72 @@ Statistiques = function() {
 	}
 
 
-	//AOP
-	//log input this
-	//log output result
+	/* AOP, second fly */
+	// var old = this.getEnumName;
+	// this.getEnumName = function() {
+	// 	console.log("BEFORE");
+	// 	retour = old.apply(this, arguments);
+	// 	console.log("AFTER");
+	// 	return retour;
+	// }
 
 
+	/*** AOP ***/
+	var arrayProperties = Object.getOwnPropertyNames(this);
+	// // var arrayProperties = Object.getOwnPropertyNames(statistique);
+	// console.log("un", this, arrayProperties);
+	/*for (var id = 0; id < arrayProperties.length; id++) {
+		property = arrayProperties[id];
+		console.log("deux", id, property, this[property]);
+		if (typeof this[property] === "function") {
+			// 		//AOP
+			var self = this;
+						
+			console.log("AOP", property);
+			// 		console.log("AOP", "closure dedans");
+			// 		console.log("AOP", self, this);
+
+			var callee = self[property];
+			// console.log("AOP", callee);
+			// var retour = callee.call(this);
+			this[property] = function() {
+				console.info("TRACE : input function:", property, " input:", arguments);
+				var retour = callee.apply(this, arguments);
+				console.info("TRACE : output return:", retour);
+			}
+			// this[property] = subsitute;
+
+
+			// 		this[property] = function() {
+			// 			console.info("TRACE : input function:", property, " input:", arguments);
+			// 			var retour = callee.apply(this, arguments);
+			// 			console.info("TRACE : output function:", property, " input:", arguments);
+			// 		}
+			// 	}
+		}
+	}*/
 }
 
-// var temp = new Statistiques();
-// _.each(Object.getOwnPropertyNames(temp), function(property) {
-// 	if (typeof temp[property] === "function") {
-// 		//AOP
-// 		Statistiques[property]
-// 		console.infos("TRACE : ")
-// 	}
-// })
 
-// delete temp;
+/*** AOP **/
+Statistiques = function() {
+	var statistique = new _Statistiques();
+	var arrayProperties = Object.getOwnPropertyNames(statistique);
+	for (var id = 0; id < arrayProperties.length; id++) {
+		var property = arrayProperties[id];
+		if (typeof statistique[property] === "function") {
+			(function(statistique, property) {
+				console.info("add AOP on", property)
+				var old = statistique[property];
+				statistique[property] = function() {
+					console.log("TRACE : AOPbefore Statistiques."+property,"called with", arguments);
+					var retour = old.apply(statistique, arguments);
+					console.log("TRACE : AOPafter Statistiques."+property,"which returned", retour);
+					return retour;
+				}
+			})(statistique, property);
+		}
+	}
+	return statistique;
+}
+
