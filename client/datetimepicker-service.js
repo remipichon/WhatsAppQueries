@@ -196,6 +196,10 @@ $(document).ready(function() {
 	initDatePicker();
 	initTimePicker();
 	$("#draw-button").on("click", HighchartsService.prototype.initDrawHighcharts);
+
+	/*console.log = function(){};
+	console.info = function(){};
+	console.debug = function(){};*/
 });
 
 

@@ -10,18 +10,20 @@ Object.size = function(obj) {
 };
 
 
-function _Statistiques() {
+function _Statistiques(calculAll) {
+	var calculAll = calculAll || false;
 	this.ref = "sample";
 	this.ref = "spam_libre";
 	this.ref = "sample_big";
 	this.ref = prompt("converstion name ?");
-	console.info("Statistique with ",this.ref);
+	console.info("Statistique with ", this.ref);
 	this.betweenDate = DatetimePicker.prototype.infinityDate();
 	this.betweenHours = DatetimePicker.prototype.infinityHours();
 
 	this.enumName = null;
 	this.numberMessagePerUser = null;
 	this.totalContentPerUser = null;
+	this.totalMessageContent = null;
 	this.numberTotalMessage = null;
 	this.statNumberMessagePerUser = null;
 	this.statContentMessagePerUser = null;
@@ -31,7 +33,7 @@ function _Statistiques() {
 	//ce sort est pourri, implementer un quick sort serait bien mieux !
 	//sinon, sort les values puis reconstruire l'object à partir des values => probleme si deux values identiques
 	this.sortObject = function(ob) {
-		return ob;
+		
 		var temp = {};
 		var cont = true;
 		var nb = Object.size(ob)
@@ -78,11 +80,20 @@ function _Statistiques() {
 			}
 		});
 
-		ret = _.sortBy(names, function(name) {
-			return name;
+		// ret = _.sortBy(names, function(name) {
+		// 	return name;
+		// });
+		this.enumName = names;
+		return names;
+	};
+
+	this.sortEnumName = function() {
+		var names = [];
+		_.each(this.numberMessagePerUser, function(value, name) {
+			names.push(name);
 		});
-		this.enumName = ret;
-		return ret;
+		this.enumName = names;
+		return names;
 	};
 
 	this.getNumberMessagePerUser = function() {
@@ -184,17 +195,68 @@ function _Statistiques() {
 
 		var occurences = {};
 		var enumName = this.getEnumName();
-		var contentPerUser = this.getTotalContentPerUser();
-		var totalMessageContent = 0;
-		_.each(contentPerUser, function(l) {
-			totalMessageContent += l;
-		});
+		if (this.totalMessageContent === null) {
+			var contentPerUser = this.getTotalContentPerUser();
+			var totalMessageContent = 0;
+			_.each(contentPerUser, function(l) {
+				totalMessageContent += l;
+			});
+		}
+
 		_.each(enumName, function(name) {
 			occurences[name] = contentPerUser[name] / totalMessageContent;
 		});
 		occurences = this.sortObject(occurences);
 		this.statContentMessagePerUser = occurences;
 		return occurences;
+	}
+
+	this.calculAll = function() {
+		var betweenDate = this.betweenDate;
+		var ref = this.ref;
+		var betweenHours = this.betweenHours;
+		var totalContent = 0;
+		var totalContentPerUser = {};
+		var statNumberMessagePerUser = {};
+		var numberMessagePerUser = this.getNumberMessagePerUser();
+		var numberTotalMessage = this.getNumberTotalMessage();
+		_.each(this.getEnumName(), function(userName) { //for each sorted userName
+			var rowsName = Data.find({
+				$and: [{
+						userName: userName
+					}, {
+						reference: ref
+					},
+					betweenDate,
+					betweenHours
+				]
+			}).fetch();
+
+			var tot = 0;
+			_.each(rowsName, function(record) { //for each row (message) of an userName
+				tot += record.content.length;
+			});
+			totalContentPerUser[userName] = tot;
+
+			statNumberMessagePerUser[userName] = numberMessagePerUser[userName] / numberTotalMessage;
+
+		});
+
+		this.totalContentPerUser = totalContentPerUser;
+		this.statNumberMessagePerUser = statNumberMessagePerUser;
+	}
+
+
+	this.setAll = function() {
+		console.info("Statistiques.setAll : starting ...")
+		this.getNumberTotalMessage();
+		this.getEnumName();
+		this.getNumberMessagePerUser();
+		this.sortEnumName();
+		this.calculAll();
+		console.info("Statistiques.setAll : end")
+
+
 	}
 
 	this.printStat = function() {
@@ -204,6 +266,10 @@ function _Statistiques() {
 		console.info("total content per user ", this.getTotalContentPerUser());
 		console.info("stat number message per user", this.getStatNumberMessagePerUser());
 		console.info("stat content message per user ", this.getStatContentMessagePerUser());
+	}
+
+	if (calculAll) {
+		this.setAll();
 	}
 
 
@@ -255,8 +321,9 @@ function _Statistiques() {
 
 
 /*** AOP **/
-Statistiques = function() {
-	var statistique = new _Statistiques();
+Statistiques = function(calculAll) {
+	var calculAll = calculAll || false;
+	var statistique = new _Statistiques(false); //false pour laisser le temps à l'aop d'etre init
 	var arrayProperties = Object.getOwnPropertyNames(statistique);
 	for (var id = 0; id < arrayProperties.length; id++) {
 		var property = arrayProperties[id];
@@ -265,14 +332,18 @@ Statistiques = function() {
 				console.info("add AOP on", property)
 				var old = statistique[property];
 				statistique[property] = function() {
-					console.log("TRACE : AOPbefore Statistiques."+property,"called with", arguments);
+					console.log("TRACE : AOPbefore Statistiques." + property, "called with", arguments);
 					var retour = old.apply(statistique, arguments);
-					console.log("TRACE : AOPafter Statistiques."+property,"which returned", retour);
+					console.log("TRACE : AOPafter Statistiques." + property, "which returned", retour);
 					return retour;
 				}
 			})(statistique, property);
 		}
 	}
+
+	if (calculAll) {
+		statistique.setAll();
+	}
+
 	return statistique;
 }
-

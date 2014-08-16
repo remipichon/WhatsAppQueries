@@ -43,16 +43,15 @@ HighchartsService.prototype.drawUserBarChart = function(statistique) {
             color: 'rgba(165,170,217,1)',
             data: _.values(statistique.getNumberMessagePerUser()),
             pointPadding: 0.3,
-            pointPlacement: -0.2}
-        // }, {
-        //     name: 'Content typed',
-        //     color: 'rgba(126,86,134,.9)',
-        //     data: _.values(statistique.getTotalContentPerUser()),
-        //     pointPadding: 0.4,
-        //     pointPlacement: -0.2,
-        //     yAxis: 1
-        // }
-        ]
+            pointPlacement: -0.2
+        }, {
+            name: 'Content typed',
+            color: 'rgba(126,86,134,.9)',
+            data: _.values(statistique.getTotalContentPerUser()),
+            pointPadding: 0.4,
+            pointPlacement: -0.2,
+            yAxis: 1
+        }]
     });
 }
 
@@ -153,7 +152,7 @@ HighchartsService.prototype.drawHighcharts = function(statistique) {
 
 HighchartsService.prototype.initDrawHighcharts = function() {
 
-    statistique = new Statistiques();
+    statistique = new Statistiques(true);
 
     var endDate = datetimepicker.findOne({
         type: "endDate"
