@@ -1,6 +1,6 @@
 HighchartsService = function(){}
 
-HighchartsService.drawUserBarChart = function(statistique) {
+HighchartsService.prototype.drawUserBarChart = function(statistique) {
 
     var $chart = $('#user-bar-chart');
     if(typeof $chart.highcharts() !== "undefined") $chart.highcharts().destroy();
@@ -43,20 +43,21 @@ HighchartsService.drawUserBarChart = function(statistique) {
             color: 'rgba(165,170,217,1)',
             data: _.values(statistique.getNumberMessagePerUser()),
             pointPadding: 0.3,
-            pointPlacement: -0.2
-        }, {
-            name: 'Content typed',
-            color: 'rgba(126,86,134,.9)',
-            data: _.values(statistique.getTotalContentPerUser()),
-            pointPadding: 0.4,
-            pointPlacement: -0.2,
-            yAxis: 1
-        }]
+            pointPlacement: -0.2}
+        // }, {
+        //     name: 'Content typed',
+        //     color: 'rgba(126,86,134,.9)',
+        //     data: _.values(statistique.getTotalContentPerUser()),
+        //     pointPadding: 0.4,
+        //     pointPlacement: -0.2,
+        //     yAxis: 1
+        // }
+        ]
     });
 }
 
 
-HighchartsService.drawContentUserPieChart = function(statistique) {
+HighchartsService.prototype.drawContentUserPieChart = function(statistique) {
 
     var $chart = $('#user-content-pie-chart');
     if(typeof $chart.highcharts() !== "undefined") $chart.highcharts().destroy();
@@ -97,7 +98,7 @@ HighchartsService.drawContentUserPieChart = function(statistique) {
 }
 
 
-HighchartsService.drawMessageUserPieChart = function(statistique) {
+HighchartsService.prototype.drawMessageUserPieChart = function(statistique) {
 
     var $chart = $('#user-message-pie-chart');
     if(typeof $chart.highcharts() !== "undefined") $chart.highcharts().destroy();
@@ -138,18 +139,19 @@ HighchartsService.drawMessageUserPieChart = function(statistique) {
 }
 
 
-HighchartsService.drawHighcharts = function(statistique) {
+HighchartsService.prototype.drawHighcharts = function(statistique) {
 
     if(! statistique instanceof Statistiques ){
-        statistique = new Statistiques();
+        return console.error("drawHighcharts : not statistique args");
     }
-    HighchartsService.drawUserBarChart(statistique);
-    HighchartsService.drawMessageUserPieChart(statistique);
-    HighchartsService.drawContentUserPieChart(statistique);
+    var highchartsService = new HighchartsService();
+    highchartsService.drawUserBarChart(statistique);
+    highchartsService.drawMessageUserPieChart(statistique);
+    highchartsService.drawContentUserPieChart(statistique);
 }
 
 
-HighchartsService.initDrawHighcharts = function() {
+HighchartsService.prototype.initDrawHighcharts = function() {
 
     statistique = new Statistiques();
 
@@ -178,8 +180,8 @@ HighchartsService.initDrawHighcharts = function() {
             $lt: endHours
         }
     };
-
-    HighchartsService.drawHighcharts(statistique);
+    console.info("HighchartsService.initDrawHighcharts statistique",statistique);
+    HighchartsService.prototype.drawHighcharts(statistique);
 }
 
 // must be after adding methods to prototype

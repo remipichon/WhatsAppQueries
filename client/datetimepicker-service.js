@@ -1,6 +1,6 @@
 DatetimePicker = function(){}
 
-DatetimePicker.infinityDate = function() {
+DatetimePicker.prototype.infinityDate = function() {
 	start = new Date(1970, 1, 1, 0, 0, 0, 0);
 	end = new Date();
 	return {
@@ -11,7 +11,7 @@ DatetimePicker.infinityDate = function() {
 	};
 }
 
-DatetimePicker.infinityHours = function() {
+DatetimePicker.prototype.infinityHours = function() {
 	start = new Date(1970, 1, 1, 0, 0, 0, 0);
 	end = new Date(1970, 1, 1, 23, 59, 59, 999);
 	return {
@@ -38,7 +38,7 @@ printStatsBetweenDate = function(start, end) {
 	new Statistique(betweenDate).printStat();
 }
 
-DatetimePicker.readDate = function(date) {
+DatetimePicker.prototype.readDate = function(date) {
 	return new Date(date.substring(0, 4),
 		date.substring(5, 7) - 1,
 		date.substring(8, 10),
@@ -46,7 +46,7 @@ DatetimePicker.readDate = function(date) {
 		date.substring(14, 16), 0, 0);
 }
 
-DatetimePicker.readHour = function(date) {
+DatetimePicker.prototype.readHour = function(date) {
 	return new Date(1970, 1, 1,
 		date.substring(0, 2),
 		date.substring(3, 5), 0, 0);
@@ -90,7 +90,6 @@ datetimepicker.insert({
 
 datetimepicker.find({}).observeChanges({
 	changed: function() {
-		var highcharts = new HighchartsService();
 
 		if (Data.find({}).fetch().length > 300) {
 			$("#draw-button").fadeIn(400);
@@ -98,7 +97,7 @@ datetimepicker.find({}).observeChanges({
 		}
 
 
-		highcharts.initDrawHighcharts();
+		HighchartsService.initDrawHighcharts();
 
 	}
 });
@@ -108,7 +107,7 @@ initDatePicker = function() {
 		format: 'Y/m/d',
 		timepicker: false,
 		onChangeDateTime: function(dp, $input) {
-			startDate = DatetimePicker.readDate($input.val());
+			startDate = DatetimePicker.prototype.readDate($input.val());
 			datetimepicker.update(
 				datetimepicker.findOne({
 					type: "startDate"
@@ -129,7 +128,7 @@ initDatePicker = function() {
 		format: 'Y/m/d',
 		timepicker: false,
 		onChangeDateTime: function(dp, $input) {
-			endDate = DatetimePicker.readDate($input.val());
+			endDate = DatetimePicker.prototype.readDate($input.val());
 			datetimepicker.update(
 				datetimepicker.findOne({
 					type: "endDate"
@@ -196,7 +195,7 @@ initTimePicker = function() {
 $(document).ready(function() {
 	initDatePicker();
 	initTimePicker();
-	$("#draw-button").on("click", HighchartsService.initDrawHighcharts);
+	$("#draw-button").on("click", HighchartsService.prototype.initDrawHighcharts);
 });
 
 

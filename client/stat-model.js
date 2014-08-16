@@ -11,10 +11,13 @@ Object.size = function(obj) {
 
 
 function _Statistiques() {
-	this.ref = "sample.txt";
-	//this.ref = "spam_libre.txt";
-	this.betweenDate = DatetimePicker.infinityDate();
-	this.betweenHours = DatetimePicker.infinityHours();
+	this.ref = "sample";
+	this.ref = "spam_libre";
+	this.ref = "sample_big";
+	this.ref = prompt("converstion name ?");
+	console.info("Statistique with ",this.ref);
+	this.betweenDate = DatetimePicker.prototype.infinityDate();
+	this.betweenHours = DatetimePicker.prototype.infinityHours();
 
 	this.enumName = null;
 	this.numberMessagePerUser = null;
@@ -28,6 +31,7 @@ function _Statistiques() {
 	//ce sort est pourri, implementer un quick sort serait bien mieux !
 	//sinon, sort les values puis reconstruire l'object à partir des values => probleme si deux values identiques
 	this.sortObject = function(ob) {
+		return ob;
 		var temp = {};
 		var cont = true;
 		var nb = Object.size(ob)
