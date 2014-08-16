@@ -152,8 +152,8 @@ initTimePicker = function() {
 		format: 'H:i',
 		datepicker: false,
 		onChangeDateTime: function(dp, $input) {
-			start = readHour($input.val());
-			datetimepicker.update(
+			start = DatetimePicker.prototype.readHour($input.val());
+			var ret = datetimepicker.update(
 				datetimepicker.findOne({
 					type: "startHours"
 				})._id, {
@@ -161,6 +161,8 @@ initTimePicker = function() {
 						hours: start
 					}
 				});
+			console.debug("start time picker hours",start,ret);
+
 		},
 		onShow: function(ct) {
 			this.setOptions({
@@ -173,7 +175,7 @@ initTimePicker = function() {
 		format: 'H:i',
 		datepicker: false,
 		onChangeDateTime: function(dp, $input) {
-			end = readHour($input.val());
+			end = DatetimePicker.prototype.readHour($input.val());
 			datetimepicker.update(
 				datetimepicker.findOne({
 					type: "endHours"

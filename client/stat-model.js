@@ -27,6 +27,7 @@ function _Statistiques(calculAll) {
 	this.numberTotalMessage = null;
 	this.statNumberMessagePerUser = null;
 	this.statContentMessagePerUser = null;
+	this.numberCharacterPerMessagePerUser = null;
 
 	this.sorted;
 
@@ -80,9 +81,6 @@ function _Statistiques(calculAll) {
 			}
 		});
 
-		// ret = _.sortBy(names, function(name) {
-		// 	return name;
-		// });
 		this.enumName = names;
 		return names;
 	};
@@ -211,6 +209,10 @@ function _Statistiques(calculAll) {
 		return occurences;
 	}
 
+	this.getNumberCharacterPerMessagePerUser = function(){
+		return this.numberCharacterPerMessagePerUser;
+	}
+
 	this.calculAll = function() {
 		var betweenDate = this.betweenDate;
 		var ref = this.ref;
@@ -218,6 +220,7 @@ function _Statistiques(calculAll) {
 		var totalContent = 0;
 		var totalContentPerUser = {};
 		var statNumberMessagePerUser = {};
+		var numberCharacterPerMessagePerUser = {};
 		var numberMessagePerUser = this.getNumberMessagePerUser();
 		var numberTotalMessage = this.getNumberTotalMessage();
 		_.each(this.getEnumName(), function(userName) { //for each sorted userName
@@ -232,16 +235,22 @@ function _Statistiques(calculAll) {
 				]
 			}).fetch();
 
+			//content per user
 			var tot = 0;
 			_.each(rowsName, function(record) { //for each row (message) of an userName
 				tot += record.content.length;
 			});
 			totalContentPerUser[userName] = tot;
 
+			//stat number message per user
 			statNumberMessagePerUser[userName] = numberMessagePerUser[userName] / numberTotalMessage;
+
+			//number characters per message per user
+			numberCharacterPerMessagePerUser[userName] = totalContentPerUser[userName] / numberMessagePerUser[userName]
 
 		});
 
+		this.numberCharacterPerMessagePerUser = numberCharacterPerMessagePerUser;
 		this.totalContentPerUser = totalContentPerUser;
 		this.statNumberMessagePerUser = statNumberMessagePerUser;
 	}
@@ -333,6 +342,7 @@ Statistiques = function(calculAll) {
 				var old = statistique[property];
 				statistique[property] = function() {
 					console.log("TRACE : AOPbefore Statistiques." + property, "called with", arguments);
+					console.log("TRACE : AOPbefore Statistiques." + property, "called with this.hours", this.betweenHours);
 					var retour = old.apply(statistique, arguments);
 					console.log("TRACE : AOPafter Statistiques." + property, "which returned", retour);
 					return retour;

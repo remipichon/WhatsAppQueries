@@ -1,9 +1,9 @@
-HighchartsService = function(){}
+HighchartsService = function() {}
 
 HighchartsService.prototype.drawUserBarChart = function(statistique) {
 
     var $chart = $('#user-bar-chart');
-    if(typeof $chart.highcharts() !== "undefined") $chart.highcharts().destroy();
+    if (typeof $chart.highcharts() !== "undefined") $chart.highcharts().destroy();
     $chart.highcharts({
         chart: {
             type: 'bar'
@@ -13,6 +13,7 @@ HighchartsService.prototype.drawUserBarChart = function(statistique) {
         },
         xAxis: {
             categories: statistique.getEnumName()
+
         },
         yAxis: [{
             min: 0,
@@ -21,9 +22,12 @@ HighchartsService.prototype.drawUserBarChart = function(statistique) {
             }
         }, {
             title: {
+                text: 'Content per message'
+            },
+        }, {
+            title: {
                 text: 'Content (nb caracters)'
             },
-            opposite: true
         }],
         legend: {
             shadow: false
@@ -37,20 +41,28 @@ HighchartsService.prototype.drawUserBarChart = function(statistique) {
                 shadow: false,
                 borderWidth: 0
             }
-        },
+            },
         series: [{
-            name: 'Messages send',
-            color: 'rgba(165,170,217,1)',
+            name: 'Messages sent',
+            color: 'rgba(165,170,217,.7)',
             data: _.values(statistique.getNumberMessagePerUser()),
+            pointPadding: 0.2,
+            pointPlacement: -0.2,
+            yAxis: 0
+        }, {
+            name: 'Content per message typed',
+            color: 'rgba(209, 50, 144, 0.7)',
+            data: _.values(statistique.getNumberCharacterPerMessagePerUser()),
             pointPadding: 0.3,
-            pointPlacement: -0.2
+            pointPlacement: -0.2,
+            yAxis: 1
         }, {
             name: 'Content typed',
-            color: 'rgba(126,86,134,.9)',
+            color: 'rgba(126,86,134,.7)',
             data: _.values(statistique.getTotalContentPerUser()),
             pointPadding: 0.4,
             pointPlacement: -0.2,
-            yAxis: 1
+            yAxis: 2
         }]
     });
 }
@@ -59,7 +71,7 @@ HighchartsService.prototype.drawUserBarChart = function(statistique) {
 HighchartsService.prototype.drawContentUserPieChart = function(statistique) {
 
     var $chart = $('#user-content-pie-chart');
-    if(typeof $chart.highcharts() !== "undefined") $chart.highcharts().destroy();
+    if (typeof $chart.highcharts() !== "undefined") $chart.highcharts().destroy();
 
     $('#user-content-pie-chart').highcharts({
         chart: {
@@ -79,7 +91,7 @@ HighchartsService.prototype.drawContentUserPieChart = function(statistique) {
                 cursor: 'pointer',
                 dataLabels: {
                     enabled: true,
-                    format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                    format: '<span style="font-size: 15px;"><span style="font-size: 16px; font-weight:bold;">{point.name}</span>: {point.percentage:.1f} %</span>',
                     style: {
                         color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
                     }
@@ -100,7 +112,7 @@ HighchartsService.prototype.drawContentUserPieChart = function(statistique) {
 HighchartsService.prototype.drawMessageUserPieChart = function(statistique) {
 
     var $chart = $('#user-message-pie-chart');
-    if(typeof $chart.highcharts() !== "undefined") $chart.highcharts().destroy();
+    if (typeof $chart.highcharts() !== "undefined") $chart.highcharts().destroy();
 
     $('#user-message-pie-chart').highcharts({
         chart: {
@@ -120,9 +132,10 @@ HighchartsService.prototype.drawMessageUserPieChart = function(statistique) {
                 cursor: 'pointer',
                 dataLabels: {
                     enabled: true,
-                    format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                    format: '<span style="font-size: 15px;"><span style="font-size: 16px; font-weight:bold;">{point.name}</span>: {point.percentage:.1f} %</span>',
                     style: {
-                        color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                        color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black',
+
                     }
                 }
             }
@@ -140,7 +153,7 @@ HighchartsService.prototype.drawMessageUserPieChart = function(statistique) {
 
 HighchartsService.prototype.drawHighcharts = function(statistique) {
 
-    if(! statistique instanceof Statistiques ){
+    if (!statistique instanceof Statistiques) {
         return console.error("drawHighcharts : not statistique args");
     }
     var highchartsService = new HighchartsService();
@@ -152,7 +165,7 @@ HighchartsService.prototype.drawHighcharts = function(statistique) {
 
 HighchartsService.prototype.initDrawHighcharts = function() {
 
-    statistique = new Statistiques(true);
+    statistique = new Statistiques(false);
 
     var endDate = datetimepicker.findOne({
         type: "endDate"
@@ -179,18 +192,17 @@ HighchartsService.prototype.initDrawHighcharts = function() {
             $lt: endHours
         }
     };
-    console.info("HighchartsService.initDrawHighcharts statistique",statistique);
+
+    statistique.setAll();
+    console.info("HighchartsService.initDrawHighcharts statistique", statistique);
     HighchartsService.prototype.drawHighcharts(statistique);
 }
 
 // must be after adding methods to prototype
 Aop.around("", function(f) {
-        //arguments[0].arguments[0] += 10;      
-      console.log("TRACE : AOPbefore HighchartsService."+f.fnName,"called with", ((arguments[0].arguments.length == 0)? "no args":arguments[0].arguments) );
-      var retour = Aop.next(f); //mandatory
-      console.log("TRACE : AOPafter HighchartsService."+f.fnName,"which returned",retour);
-      return retour; //mandatory
-}, [ HighchartsService.prototype ]); 
-
-
-
+    //arguments[0].arguments[0] += 10;      
+    console.log("TRACE : AOPbefore HighchartsService." + f.fnName, "called with", ((arguments[0].arguments.length == 0) ? "no args" : arguments[0].arguments));
+    var retour = Aop.next(f); //mandatory
+    console.log("TRACE : AOPafter HighchartsService." + f.fnName, "which returned", retour);
+    return retour; //mandatory
+}, [HighchartsService.prototype]);

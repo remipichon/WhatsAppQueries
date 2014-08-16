@@ -89,7 +89,7 @@ parseFile = function(filename, conversationName, add) {
 
       //is the row a multiple row ?
       if (pasM == null || pasD == null) {
-        console.debug("parseFile : row is a multiple row", row);
+        // console.debug("parseFile : row is a multiple row", row);
         var content = row;
         isMultiple = false;
         //we use previous metadata
@@ -116,8 +116,8 @@ parseFile = function(filename, conversationName, add) {
         var content = row.substring(header.length + 3, row.length);
       }
 
-      console.debug(row);
-      console.debug(date, userName, content);
+      // console.debug(row);
+      // console.debug(date, userName, content);
 
 
       Data.insert({
