@@ -20,23 +20,18 @@ DatetimePicker.prototype.infinityHours = function() {
 			$lt: end
 		}
 	};
-}
+};
 
-//deprecated
-printStatsBetweenDate = function(start, end) {
-
-	start = start || new 1970(Date, 1, 1, 0, 0, 0, 0);
-	end = end || new Date();
-	ref = ref || "sample.txt";
-	var betweenDate = {
-		"date.ISO": {
+DatetimePicker.prototype.oneHour = function() {
+	start = new Date(1970, 1, 1, 0, 0, 0, 0);
+	end = new Date(1970, 1, 1, 0, 59, 59, 99);
+	return {
+		"hours.ISO": {
 			$gte: start,
 			$lt: end
 		}
 	};
-
-	new Statistique(betweenDate).printStat();
-}
+};
 
 DatetimePicker.prototype.readDate = function(date) {
 	return new Date(date.substring(0, 4),
@@ -50,7 +45,14 @@ DatetimePicker.prototype.readHour = function(date) {
 	return new Date(1970, 1, 1,
 		date.substring(0, 2),
 		date.substring(3, 5), 0, 0);
-}
+};
+
+DatetimePicker.prototype.nextHour = function(date){
+	date["hours.ISO"].$gte.setHours(date["hours.ISO"].$gte.getHours()+1);
+	date["hours.ISO"].$lt.setHours(date["hours.ISO"].$lt.getHours()+1);
+
+	return date;
+};
 
 // must be after adding methods to prototype
 Aop.around("", function(f) {

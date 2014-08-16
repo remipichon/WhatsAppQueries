@@ -28,13 +28,14 @@ function _Statistiques(calculAll) {
 	this.statNumberMessagePerUser = null;
 	this.statContentMessagePerUser = null;
 	this.numberCharacterPerMessagePerUser = null;
+	this.messagePerUserTimeline = null;
 
 	this.sorted;
 
 	//ce sort est pourri, implementer un quick sort serait bien mieux !
 	//sinon, sort les values puis reconstruire l'object à partir des values => probleme si deux values identiques
 	this.sortObject = function(ob) {
-		
+
 		var temp = {};
 		var cont = true;
 		var nb = Object.size(ob)
@@ -94,8 +95,9 @@ function _Statistiques(calculAll) {
 		return names;
 	};
 
-	this.getNumberMessagePerUser = function() {
+	this.getNumberMessagePerUser = function(toSort) {
 		if (this.numberMessagePerUser !== null) return this.numberMessagePerUser;
+		if (typeof toSort === "undefined") toSort = true;
 		var betweenDate = this.betweenDate;
 		var ref = this.ref;
 		var betweenHours = this.betweenHours;
@@ -116,9 +118,8 @@ function _Statistiques(calculAll) {
 			}).fetch().length;
 
 		});
-
-
-		occurences = this.sortObject(occurences);
+		if (toSort === true)
+			occurences = this.sortObject(occurences);
 		this.numberMessagePerUser = occurences;
 		return occurences;
 	}
@@ -209,8 +210,48 @@ function _Statistiques(calculAll) {
 		return occurences;
 	}
 
-	this.getNumberCharacterPerMessagePerUser = function(){
+	this.getNumberCharacterPerMessagePerUser = function() {
 		return this.numberCharacterPerMessagePerUser;
+	}
+
+	this.getMessagePerUserTimeline = function() {
+		if (this.messagePerUserTimeline !== null) return this.messagePerUserTimeline;
+		var allNames = this.getEnumName();
+		var hours = DatetimePicker.prototype.oneHour();
+		var numberMessagePerUser;
+		var messagePerUserTimeline = {
+			total: []
+		};
+		var total = 0;
+
+		//desactivation des logs
+		var loggin = console.log;
+		console.log = function() {};
+
+		while (hours["hours.ISO"].$gte.getHours() < 23) {
+			this.betweenHours = hours;
+			total = 0;
+			console.debug("getMessagePerUserTimeline hour", hours["hours.ISO"].$gte.getHours());
+
+			this.numberMessagePerUser = null; //force recalcul
+			numberMessagePerUser = this.getNumberMessagePerUser(false);
+
+			_.each(this.enumName, function(name) {
+				if (typeof messagePerUserTimeline[name] !== "object") {
+					messagePerUserTimeline[name] = [];
+				}
+				messagePerUserTimeline[name].push(numberMessagePerUser[name] || 0);
+				total += parseInt(messagePerUserTimeline[name][messagePerUserTimeline[name].length-1]);
+			});
+			messagePerUserTimeline.total.push(total);
+			hours = DatetimePicker.prototype.nextHour(hours);
+		}
+
+		//reactivation des logs
+		console.log = loggin;
+
+		this.messagePerUserTimeline = messagePerUserTimeline;
+		return messagePerUserTimeline;
 	}
 
 	this.calculAll = function() {
@@ -264,68 +305,11 @@ function _Statistiques(calculAll) {
 		this.sortEnumName();
 		this.calculAll();
 		console.info("Statistiques.setAll : end")
-
-
-	}
-
-	this.printStat = function() {
-
-		console.info("user ", this.getEnumName());
-		console.info("number message per user ", this.getNumberMessagePerUser());
-		console.info("total content per user ", this.getTotalContentPerUser());
-		console.info("stat number message per user", this.getStatNumberMessagePerUser());
-		console.info("stat content message per user ", this.getStatContentMessagePerUser());
 	}
 
 	if (calculAll) {
 		this.setAll();
 	}
-
-
-	/* AOP, second fly */
-	// var old = this.getEnumName;
-	// this.getEnumName = function() {
-	// 	console.log("BEFORE");
-	// 	retour = old.apply(this, arguments);
-	// 	console.log("AFTER");
-	// 	return retour;
-	// }
-
-
-	/*** AOP ***/
-	var arrayProperties = Object.getOwnPropertyNames(this);
-	// // var arrayProperties = Object.getOwnPropertyNames(statistique);
-	// console.log("un", this, arrayProperties);
-	/*for (var id = 0; id < arrayProperties.length; id++) {
-		property = arrayProperties[id];
-		console.log("deux", id, property, this[property]);
-		if (typeof this[property] === "function") {
-			// 		//AOP
-			var self = this;
-						
-			console.log("AOP", property);
-			// 		console.log("AOP", "closure dedans");
-			// 		console.log("AOP", self, this);
-
-			var callee = self[property];
-			// console.log("AOP", callee);
-			// var retour = callee.call(this);
-			this[property] = function() {
-				console.info("TRACE : input function:", property, " input:", arguments);
-				var retour = callee.apply(this, arguments);
-				console.info("TRACE : output return:", retour);
-			}
-			// this[property] = subsitute;
-
-
-			// 		this[property] = function() {
-			// 			console.info("TRACE : input function:", property, " input:", arguments);
-			// 			var retour = callee.apply(this, arguments);
-			// 			console.info("TRACE : output function:", property, " input:", arguments);
-			// 		}
-			// 	}
-		}
-	}*/
 }
 
 
@@ -342,7 +326,7 @@ Statistiques = function(calculAll) {
 				var old = statistique[property];
 				statistique[property] = function() {
 					console.log("TRACE : AOPbefore Statistiques." + property, "called with", arguments);
-					console.log("TRACE : AOPbefore Statistiques." + property, "called with this.hours", this.betweenHours);
+					//console.log("TRACE : AOPbefore Statistiques." + property, "called with this.hours", this.betweenHours);
 					var retour = old.apply(statistique, arguments);
 					console.log("TRACE : AOPafter Statistiques." + property, "which returned", retour);
 					return retour;

@@ -151,15 +151,65 @@ HighchartsService.prototype.drawMessageUserPieChart = function(statistique) {
 }
 
 
+HighchartsService.prototype.drawMessageBarChartTimeline = function(statistique) {
+    var categories = [];
+
+    var series = [];
+    var messagePerUserTimeline = statistique.getMessagePerUserTimeline();
+    _.each(messagePerUserTimeline,function(value,name){
+        series.push({
+            name: name,
+            data: value
+        });
+    });
+
+    for(var i = 0; i<=23;i++){
+        categories.push(i+"h")
+    }
+
+    $('#user-bar-chart-timeline').highcharts({
+        title: {
+            text: 'Message per user per hour',
+            x: -20 //center
+        },
+        xAxis: {
+            categories: categories
+        },
+        yAxis: {
+            title: {
+                text: 'Nb messages'
+            },
+            plotLines: [{
+                value: 0,
+                width: 1,
+                color: '#808080'
+            }]
+        },
+        tooltip: {
+            valueSuffix: 'messages'
+        },
+        legend: {
+            layout: 'vertical',
+            align: 'right',
+            verticalAlign: 'middle',
+            borderWidth: 0
+        },
+        series: series
+    });
+}
+
+
 HighchartsService.prototype.drawHighcharts = function(statistique) {
 
     if (!statistique instanceof Statistiques) {
         return console.error("drawHighcharts : not statistique args");
     }
     var highchartsService = new HighchartsService();
-    highchartsService.drawUserBarChart(statistique);
-    highchartsService.drawMessageUserPieChart(statistique);
-    highchartsService.drawContentUserPieChart(statistique);
+    // highchartsService.drawUserBarChart(statistique);
+    // highchartsService.drawMessageUserPieChart(statistique);
+    // highchartsService.drawContentUserPieChart(statistique);
+    highchartsService.drawMessageBarChartTimeline(statistique);
+
 }
 
 
@@ -193,7 +243,7 @@ HighchartsService.prototype.initDrawHighcharts = function() {
         }
     };
 
-    statistique.setAll();
+    //statistique.setAll();
     console.info("HighchartsService.initDrawHighcharts statistique", statistique);
     HighchartsService.prototype.drawHighcharts(statistique);
 }
