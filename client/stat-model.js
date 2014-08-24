@@ -29,8 +29,15 @@ function _Statistiques(calculAll) {
 	this.statContentMessagePerUser = null;
 	this.numberCharacterPerMessagePerUser = null;
 	this.messagePerUserTimeline = null;
+	this.fetchedRows = null;
 
 	this.sorted;
+
+
+	//reset fetchedRows in order to fetch again rows if asked
+	this.resetFetchedRows = function() {
+		this.fetchedRows = null;
+	}
 
 	//ce sort est pourri, implementer un quick sort serait bien mieux !
 	//sinon, sort les values puis reconstruire l'object à partir des values => probleme si deux values identiques
@@ -62,12 +69,20 @@ function _Statistiques(calculAll) {
 	this.getEnumName = function() {
 		if (this.enumName !== null) return this.enumName;
 
+		var names = [];
+		if (this.fetchedRows !== null) {
+			_.each(this.fetchedRows, function(value, key) {
+				names.push(key);
+			});
+			return names;
+		}
+
 		var betweenDate = this.betweenDate;
 		var ref = this.ref;
 		var betweenHours = this.betweenHours;
 
 
-		var names = [];
+
 		_.each(Data.find({
 			$and: [{
 					reference: this.ref
@@ -95,9 +110,42 @@ function _Statistiques(calculAll) {
 		return names;
 	};
 
-	this.getNumberMessagePerUser = function(toSort) {
+	this.fetchesRows = function() {
+		if (this.fetchedRows !== null) return this.fetchedRows;
+		var occurences = {};
+		var name;
+		var cpt = 0;
+		_.each(Data.find({
+			$and: [{
+					reference: this.ref
+				},
+				this.betweenDate,
+				this.betweenHours
+			]
+		}).fetch(), function(row) {
+			name = row.userName;
+			if (typeof occurences[name] !== "object") {
+				occurences[name] = [];
+			}
+			occurences[name].push(row);
+			cpt++;
+		});
+		this.fetchedRows = occurences;
+		this.numberTotalMessage = cpt;
+		return occurences;
+	}
+
+	this.getNumberMessagePerUser = function(toSort, refetch) {
 		if (this.numberMessagePerUser !== null) return this.numberMessagePerUser;
 		if (typeof toSort === "undefined") toSort = true;
+		if (typeof toSorefetchrt !== "boolean") refetch = false;
+		if (this.fetchedRows !== null && refetch === false) {
+			log.warn("get nb msg per user use fetchedRows")
+			var fetchedRows = this.fetchedRows;
+		} else {
+			log.warn("get use db")
+			var fetchedRows = null;
+		}
 		var betweenDate = this.betweenDate;
 		var ref = this.ref;
 		var betweenHours = this.betweenHours;
@@ -106,16 +154,20 @@ function _Statistiques(calculAll) {
 		var occurences = {};
 		_.each(enumName, function(userName) {
 
-			occurences[userName] = Data.find({
-				$and: [{
-						userName: userName
-					}, {
-						reference: ref
-					},
-					betweenDate,
-					betweenHours
-				]
-			}).fetch().length;
+			if (fetchedRows !== null) {
+				occurences[userName] = fetchedRows[userName].length;
+			} else {
+				occurences[userName] = Data.find({
+					$and: [{
+							userName: userName
+						}, {
+							reference: ref
+						},
+						betweenDate,
+						betweenHours
+					]
+				}).fetch().length;
+			}
 
 		});
 		if (toSort === true)
@@ -126,6 +178,11 @@ function _Statistiques(calculAll) {
 
 	this.getTotalContentPerUser = function() {
 		if (this.totalContentPerUser !== null) return this.totalContentPerUser;
+		if (this.fetchedRows !== null) {
+			var fetchedRows = this.fetchedRows;
+		} else {
+			var fetchedRows = null;
+		}
 		var betweenDate = this.betweenDate;
 		var ref = this.ref;
 		var betweenHours = this.betweenHours;
@@ -134,16 +191,24 @@ function _Statistiques(calculAll) {
 		var occurences = {};
 		_.each(enumName, function(userName) {
 			var tot = 0;
-			_.each(Data.find({
-				$and: [{
-						userName: userName
-					}, {
-						reference: ref
-					},
-					betweenDate,
-					betweenHours
-				]
-			}).fetch(), function(record) {
+
+
+			if (fetchedRows !== null) {
+				var userRows = fetchedRows[userName];
+			} else {
+				var userRows = Data.find({
+					$and: [{
+							userName: userName
+						}, {
+							reference: ref
+						},
+						betweenDate,
+						betweenHours
+					]
+				}).fetch();
+			}
+
+			_.each(userRows, function(record) {
 				tot += record.content.length;
 			});
 
@@ -232,17 +297,17 @@ function _Statistiques(calculAll) {
 			total = 0;
 
 			this.numberMessagePerUser = null; //force recalcul
-			numberMessagePerUser = this.getNumberMessagePerUser(false);
+			numberMessagePerUser = this.getNumberMessagePerUser(false,true);
 
 			_.each(this.enumName, function(name) {
 				if (typeof messagePerUserTimeline[name] !== "object") {
 					messagePerUserTimeline[name] = [];
 				}
 				messagePerUserTimeline[name].push(numberMessagePerUser[name] || 0);
-				total += parseInt(messagePerUserTimeline[name][messagePerUserTimeline[name].length-1]);
+				total += parseInt(messagePerUserTimeline[name][messagePerUserTimeline[name].length - 1]);
 			});
 			messagePerUserTimeline.total.push(total);
-			log.debug("getMessagePerUserTimeline hour", hours["hours.ISO"].$gte.getHours(),"total",total);
+			log.debug("getMessagePerUserTimeline hour", hours["hours.ISO"].$gte.getHours(), "total", total);
 			hours = DatetimePicker.prototype.nextHour(hours);
 		}
 
@@ -296,14 +361,19 @@ function _Statistiques(calculAll) {
 	}
 
 
-	this.setAll = function() {
+	this.setAll = function(callback) {
 		log.info("Statistiques.setAll : starting ...")
+		this.fetchesRows();
 		this.getNumberTotalMessage();
 		this.getEnumName();
 		this.getNumberMessagePerUser();
 		this.sortEnumName();
 		this.calculAll();
 		log.info("Statistiques.setAll : end")
+
+		if (typeof callback === "function") {
+			callback.call(this);
+		}
 	}
 
 	if (calculAll) {
@@ -324,10 +394,10 @@ Statistiques = function(calculAll) {
 				log.info("add AOP on", property)
 				var old = statistique[property];
 				statistique[property] = function() {
-					log.trace( " AOPbefore Statistiques." + property, "called with", arguments);
+					log.trace(" AOPbefore Statistiques." + property, "called with", arguments);
 					//log.trace( : AOPbefore Statistiques." + property, "called with this.hours", this.betweenHours);
 					var retour = old.apply(statistique, arguments);
-					log.trace( "AOPafter Statistiques." + property, "which returned", retour);
+					log.trace("AOPafter Statistiques." + property, "which returned", retour);
 					return retour;
 				}
 			})(statistique, property);

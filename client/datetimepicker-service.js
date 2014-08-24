@@ -200,10 +200,6 @@ $(document).ready(function() {
 	initDatePicker();
 	initTimePicker();
 	$("#draw-button").on("click", HighchartsService.prototype.initDrawHighcharts);
-
-	
-
-	//var log = log.noConflict();
 });
 
 

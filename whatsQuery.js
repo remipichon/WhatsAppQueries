@@ -1,23 +1,3 @@
-if (Meteor.isClient) {
-  Template.hello.greeting = function() {
-    return "Welcome to whatsQuery.";
-  };
-
-  Template.hello.events({
-    'click input': function() {
-      // template data, if any, is available in 'this'
-    }
-  });
-}
-
-if (Meteor.isServer) {
-  Meteor.startup(function() {
-    // code to run on server at startup
-  });
-}
-
-
-
 parseFile = function(filename, conversationName, add) {
   if (typeof filename === "undefined") {
     throw new Error("parseFile :  filename required");
