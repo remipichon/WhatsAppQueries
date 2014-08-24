@@ -16,7 +16,7 @@ function _Statistiques(calculAll) {
 	this.ref = "spam_libre";
 	this.ref = "sample_big";
 	this.ref = prompt("converstion name ?");
-	console.info("Statistique with ", this.ref);
+	log.info("Statistique with ", this.ref);
 	this.betweenDate = DatetimePicker.prototype.infinityDate();
 	this.betweenHours = DatetimePicker.prototype.infinityHours();
 
@@ -39,7 +39,7 @@ function _Statistiques(calculAll) {
 		var temp = {};
 		var cont = true;
 		var nb = Object.size(ob)
-		console.debug("Statistiques.sortObject object.length", nb, ob);
+		log.debug("Statistiques.sortObject object.length", nb, ob);
 		while (nb !== 0) {
 			cont = true;
 			var min = 10000000;
@@ -225,13 +225,11 @@ function _Statistiques(calculAll) {
 		var total = 0;
 
 		//desactivation des logs
-		var loggin = console.log;
-		console.log = function() {};
+		log.setLevel(log.levels.DEBUG);
 
 		while (hours["hours.ISO"].$gte.getHours() < 23) {
 			this.betweenHours = hours;
 			total = 0;
-			console.debug("getMessagePerUserTimeline hour", hours["hours.ISO"].$gte.getHours());
 
 			this.numberMessagePerUser = null; //force recalcul
 			numberMessagePerUser = this.getNumberMessagePerUser(false);
@@ -244,11 +242,12 @@ function _Statistiques(calculAll) {
 				total += parseInt(messagePerUserTimeline[name][messagePerUserTimeline[name].length-1]);
 			});
 			messagePerUserTimeline.total.push(total);
+			log.debug("getMessagePerUserTimeline hour", hours["hours.ISO"].$gte.getHours(),"total",total);
 			hours = DatetimePicker.prototype.nextHour(hours);
 		}
 
 		//reactivation des logs
-		console.log = loggin;
+		log.setLevel(log.levels.TRACE);
 
 		this.messagePerUserTimeline = messagePerUserTimeline;
 		return messagePerUserTimeline;
@@ -298,13 +297,13 @@ function _Statistiques(calculAll) {
 
 
 	this.setAll = function() {
-		console.info("Statistiques.setAll : starting ...")
+		log.info("Statistiques.setAll : starting ...")
 		this.getNumberTotalMessage();
 		this.getEnumName();
 		this.getNumberMessagePerUser();
 		this.sortEnumName();
 		this.calculAll();
-		console.info("Statistiques.setAll : end")
+		log.info("Statistiques.setAll : end")
 	}
 
 	if (calculAll) {
@@ -322,13 +321,13 @@ Statistiques = function(calculAll) {
 		var property = arrayProperties[id];
 		if (typeof statistique[property] === "function") {
 			(function(statistique, property) {
-				console.info("add AOP on", property)
+				log.info("add AOP on", property)
 				var old = statistique[property];
 				statistique[property] = function() {
-					console.log("TRACE : AOPbefore Statistiques." + property, "called with", arguments);
-					//console.log("TRACE : AOPbefore Statistiques." + property, "called with this.hours", this.betweenHours);
+					log.trace( " AOPbefore Statistiques." + property, "called with", arguments);
+					//log.trace( : AOPbefore Statistiques." + property, "called with this.hours", this.betweenHours);
 					var retour = old.apply(statistique, arguments);
-					console.log("TRACE : AOPafter Statistiques." + property, "which returned", retour);
+					log.trace( "AOPafter Statistiques." + property, "which returned", retour);
 					return retour;
 				}
 			})(statistique, property);

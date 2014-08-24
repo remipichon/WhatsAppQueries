@@ -57,9 +57,9 @@ DatetimePicker.prototype.nextHour = function(date){
 // must be after adding methods to prototype
 Aop.around("", function(f) {
 		//arguments[0].arguments[0] += 10;		
-	  console.log("TRACE : AOPbefore DatetimePicker."+f.fnName,"called with", ((arguments[0].arguments.length == 0)? "no args":arguments[0].arguments) );
+	  log.trace( " AOPbefore DatetimePicker."+f.fnName,"called with", ((arguments[0].arguments.length == 0)? "no args":arguments[0].arguments) );
 	  var retour = Aop.next(f); //mandatory
-	  console.log("TRACE : AOPafter DatetimePicker."+f.fnName,"which returned",retour);
+	  log.trace( " AOPafter DatetimePicker."+f.fnName,"which returned",retour);
 	  return retour; //mandatory
 }, [ DatetimePicker.prototype ]); 
 
@@ -163,7 +163,7 @@ initTimePicker = function() {
 						hours: start
 					}
 				});
-			console.debug("start time picker hours",start,ret);
+			log.debug("start time picker hours",start,ret);
 
 		},
 		onShow: function(ct) {
@@ -201,9 +201,9 @@ $(document).ready(function() {
 	initTimePicker();
 	$("#draw-button").on("click", HighchartsService.prototype.initDrawHighcharts);
 
-	/*console.log = function(){};
-	console.info = function(){};
-	console.debug = function(){};*/
+	
+
+	//var log = log.noConflict();
 });
 
 

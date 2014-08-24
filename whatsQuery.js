@@ -89,7 +89,6 @@ parseFile = function(filename, conversationName, add) {
 
       //is the row a multiple row ?
       if (pasM == null || pasD == null) {
-        // console.debug("parseFile : row is a multiple row", row);
         var content = row;
         isMultiple = false;
         //we use previous metadata
@@ -116,10 +115,6 @@ parseFile = function(filename, conversationName, add) {
         var content = row.substring(header.length + 3, row.length);
       }
 
-      // console.debug(row);
-      // console.debug(date, userName, content);
-
-
       Data.insert({
         date: date,
         hours: hours,
@@ -142,10 +137,10 @@ parseFile = function(filename, conversationName, add) {
         toDisplay = cpt;
       }
 
-      if (toDisplay !== null) console.info("parseFile", filename, toDisplay);
+      if (toDisplay !== null) log.info("parseFile", filename, toDisplay);
     });
 
-    console.info("parseFile", cpt, "from", filename, "into", conversationName);
+    log.info("parseFile", cpt, "from", filename, "into", conversationName);
 
   });
 

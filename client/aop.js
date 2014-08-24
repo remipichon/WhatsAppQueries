@@ -36,38 +36,3 @@ Aop = {
     return f.fn.apply(this, f.arguments);
   }
 };
-
-rien = function() {
-  /* test */
-  truc = function() {
-    console.log("un")
-  }
-
-  machin = function() {
-    console.log("mahcin");
-  }
-
-
-  Class = {
-    print: function(str) {
-      console.log("print :", str);
-    }
-  }
-
-  Aop.around("", function(f) {
-    console.log("before", f.fnName);
-    Aop.next(f);
-    console.log("after", f.fnName);
-  }, Object.getOwnPropertyNames(Class));
-
-
-  Aop.around("Class.print.*", function(f) {
-    console.log("before", f.fnName);
-    Aop.next(f);
-    console.log("after", f.fnName);
-  });
-
-  un = new Class();
-  un.print("un")
-
-}
