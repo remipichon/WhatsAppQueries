@@ -10,12 +10,12 @@ Object.size = function(obj) {
 };
 
 
-function _Statistiques(calculAll) {
-	var calculAll = calculAll || false;
+function _Statistiques(options) {
+	var calculAll = options.calculAll || false;
 	this.ref = "sample";
 	this.ref = "spam_libre";
 	this.ref = "sample_big";
-	this.ref = prompt("converstion name ?");
+	this.ref = options.ref || prompt("converstion name ?");
 	log.info("Statistique with ", this.ref);
 	this.betweenDate = DatetimePicker.prototype.infinityDate();
 	this.betweenHours = DatetimePicker.prototype.infinityHours();
@@ -279,7 +279,7 @@ function _Statistiques(calculAll) {
 		return this.numberCharacterPerMessagePerUser;
 	}
 
-	this.getMessagePerUserTimeline = function() {
+	this.getMessagePerUserTimeline = function(callback) {
 		if (this.messagePerUserTimeline !== null) return this.messagePerUserTimeline;
 		var allNames = this.getEnumName();
 		var hours = DatetimePicker.prototype.oneHour();
@@ -296,8 +296,9 @@ function _Statistiques(calculAll) {
 			this.betweenHours = hours;
 			total = 0;
 
+			delete this.numberMessagePerUser;
 			this.numberMessagePerUser = null; //force recalcul
-			numberMessagePerUser = this.getNumberMessagePerUser(false,true);
+			numberMessagePerUser = this.getNumberMessagePerUser(false, true);
 
 			_.each(this.enumName, function(name) {
 				if (typeof messagePerUserTimeline[name] !== "object") {
@@ -313,6 +314,10 @@ function _Statistiques(calculAll) {
 
 		//reactivation des logs
 		log.setLevel(log.levels.TRACE);
+
+		if (typeof callback === "function") {
+			callback.call(this);
+		}
 
 		this.messagePerUserTimeline = messagePerUserTimeline;
 		return messagePerUserTimeline;
@@ -383,9 +388,27 @@ function _Statistiques(calculAll) {
 
 
 /*** AOP **/
-Statistiques = function(calculAll) {
-	var calculAll = calculAll || false;
-	var statistique = new _Statistiques(false); //false pour laisser le temps à l'aop d'etre init
+Statistiques = function(options) {
+	var initAop = (typeof options.initAop !== "undefined")? options.initAop : true
+	//to match old way
+	if (typeof options !== "object") {
+		var calculAll = calculAll || false;
+	} else {
+		var calculAll = options.calculAll || false;
+	}
+	var ref = options.ref || null;
+
+	var statistique = new _Statistiques({
+		calculAll: false, //false pour laisser le temps à l'aop d'etre init
+		ref: ref
+	}); 
+	if(!initAop){
+		if (calculAll) {
+			statistique.setAll();
+		}
+		log.trace("Statistiques : skip AOP");
+		return statistique
+	}
 	var arrayProperties = Object.getOwnPropertyNames(statistique);
 	for (var id = 0; id < arrayProperties.length; id++) {
 		var property = arrayProperties[id];

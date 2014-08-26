@@ -205,9 +205,9 @@ HighchartsService.prototype.drawHighcharts = function(statistique) {
         return log.error("drawHighcharts : not statistique args");
     }
     var highchartsService = new HighchartsService();
-    // highchartsService.drawUserBarChart(statistique);
-    // highchartsService.drawMessageUserPieChart(statistique);
-    // highchartsService.drawContentUserPieChart(statistique);
+    highchartsService.drawUserBarChart(statistique);
+    highchartsService.drawMessageUserPieChart(statistique);
+    highchartsService.drawContentUserPieChart(statistique);
     highchartsService.drawMessageBarChartTimeline(statistique);
 
 }

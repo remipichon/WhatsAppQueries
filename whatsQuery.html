@@ -3,20 +3,109 @@
 </head>
 
 <body>
-  {{> hello}}
+  {{> modalFile}}
+  {{> containerCharts}}
 </body>
 
-<template name="hello">
-  <input id="date_timepicker_start" type="text">
-  <input id="date_timepicker_end" type="text">
-  <input id="hour_timepicker_start" type="text">
-  <input id="hour_timepicker_end" type="text">
-  <button id="draw-button" type="button" style="display: block;">Draw</button>
+<template name="modalFile">
+  <div class="modal fade" id="modal-file" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+          <h4 class="modal-title" id="myModalLabel">Choose a conversation </h4>
+        </div>
+        <div class="modal-body">
+          <div class="row" id="form-conversation-filename">
+            <div class="col-md-10 col-md-offset-1">
+              <div class="panel panel-default">
+                <div class="panel-heading"><label>Select an existing one</label></div>
+                <div class="panel-body">
+                  <div class="form-group">
+                    <label class="sr-only">Select an existing one </label>
+                    <input type="text" class="form-control" id="conversation-name" placeHolder="Enter an existing conversation name">
+                  </div> 
+                </div>
+              </div>
+              <div class="panel panel-default">
+                <div class="panel-heading"><label>Or upload one of yours</label></div>
+                <div class="panel-body">
+                  <div class="form-group">
+                    <label class="sr-only">Or upload one of yours </label>
+                    <input type="file" id="fileToUpload">
+                   </div> 
+                  <div class="form-group">
+                    <label>And choose a conversation name</label>
+                    <input type="text" class="form-control" id="new-conversation-name" placeHolder="Enter a non existing conversation name">
+                  </div> 
+                </div>
+              </div>
+            </div>
+          </div>            
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary">Continue</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<template name="containerCharts">
+
+  <div id="gears-area" class="container">
+    <div class="row">
+      <div class="col-md-3">
+          <div class="row">
+              <div id="filename" class="text-center col-md-12"  
+                        data-toggle="modal" data-target="#modal-file"> 
+                        <h3>Click me !</h3> </div>
+          </div>
+      </div>
+      <div class="col-md-9">
+        <div class="row">
+          <div class="col-md-3 text-center">
+            <label> From : </label>
+           <input class="text-center date" id="date_timepicker_start" type="text">
+          </div> 
+          <div class="col-md-3 text-center">
+            <label> To : </label>
+            <input class="text-center date" id="date_timepicker_end" type="text">
+          </div>
+          <div class="col-md-3 text-center">
+            <label> beetween </label>
+            <input class="text-center time" id="hour_timepicker_start" type="text">
+          </div>
+          <div class="col-md-3 text-center"> 
+            <label> and </label>
+            <input class="text-center time" id="hour_timepicker_end" type="text">
+          </div>
+        </div>
+        <div class="row">
+          <button id="draw-button" type="button" class="col-md-12 btn btn-default">Draw charts</button>
+        </div>
+      </div>
+    </div>   
+  </div>
+
+  <div id="charts" class="container-fluid">
+    <div class="row">
+        <div id="user-bar-chart" class="col-md-12"></div>        
+    </div>
+    <div class="row">
+      <div id="user-content-pie-chart" class="col-md-6"></div>
+      <div id="user-message-pie-chart" class="col-md-6"></div>
+    </div>
+    <div class="row">
+      <div id="user-bar-chart-timeline"></div>
+    </div>
+  </div> 
 
 
-  <div id="user-bar-chart" style="min-width: 310px; max-width: 800px; height: 800px; margin: 0 auto"></div>
-  <div id="user-bar-chart-timeline" style="min-width: 310px; max-width: 800px; height: 800px; margin: 0 auto"></div>
-  <div id="user-content-pie-chart" style="min-width: 400px; height: 400px; margin: 0 auto"></div>
-  <div id="user-message-pie-chart" style="min-width: 400px; height: 400px; margin: 0 auto"></div>
+
+
+
+  
 
 </template>

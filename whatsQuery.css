@@ -1,1 +1,21 @@
 /* CSS declarations go here */
+
+
+/*div {
+	border: dashed black 1px;
+}
+*/
+
+
+/* real CSS */
+#gears-area input.date{
+	width : 60%; /*plugin xdsoft : 242px*/
+}
+
+#gears-area input.time{
+	width : 76px; /*plugin xdsoft*/
+}
+
+#charts .row {
+	margin-top: 30px;
+}
