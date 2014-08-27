@@ -1,5 +1,6 @@
 <head>
   <title>whatsQuery</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 </head>
 
 <body>
@@ -56,34 +57,35 @@
 
   <div id="gears-area" class="container">
     <div class="row">
-      <div class="col-md-3">
+      <div class="col-md-3 col-xs-12">
           <div class="row">
               <div id="filename" class="text-center col-md-12"  
                         data-toggle="modal" data-target="#modal-file"> 
                         <h3>Click me !</h3> </div>
           </div>
       </div>
+      <div class="clearfix visible-xs-block"></div>
       <div class="col-md-9">
         <div class="row">
-          <div class="col-md-3 text-center">
+          <div class="col-md-3 col-xs-12 text-center-md text-right-xs">
             <label> From : </label>
            <input class="text-center date" id="date_timepicker_start" type="text">
           </div> 
-          <div class="col-md-3 text-center">
-            <label> To : </label>
+          <div class="col-md-3 col-xs-12 text-center-md text-right-xs">
+            <label>  To :  </label>
             <input class="text-center date" id="date_timepicker_end" type="text">
           </div>
-          <div class="col-md-3 text-center">
+          <div class="col-md-3 col-xs-6 text-center-md text-right-xs">
             <label> beetween </label>
             <input class="text-center time" id="hour_timepicker_start" type="text">
           </div>
-          <div class="col-md-3 text-center"> 
+          <div class="col-md-3 col-xs-6 text-center-md text-right-xs"> 
             <label> and </label>
             <input class="text-center time" id="hour_timepicker_end" type="text">
           </div>
         </div>
         <div class="row">
-          <button id="draw-button" type="button" class="col-md-12 btn btn-default">Draw charts</button>
+          <button id="draw-button" type="button" class="col-md-12 col-xs-12 btn btn-default">Draw charts</button>
         </div>
       </div>
     </div>   

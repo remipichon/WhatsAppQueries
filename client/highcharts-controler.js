@@ -136,13 +136,14 @@ HighchartsService.prototype.drawMessageUserPieChart = function(statistique) {
         tooltip: {
             pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
         },
+        minSize: 120,
         plotOptions: {
             pie: {
                 allowPointSelect: true,
                 cursor: 'pointer',
                 dataLabels: {
                     enabled: true,
-                    format: '<span style="font-size: 15px;"><span style="font-size: 16px; font-weight:bold;">{point.name}</span>: {point.percentage:.1f} %</span>',
+                    format: '<span style="font-size_: 15px;"><span style="font-size: 16px; font-weight:bold;">{point.name}</span>: {point.percentage:.1f} %</span>',
                     style: {
                         color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black',
 
