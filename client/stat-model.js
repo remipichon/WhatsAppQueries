@@ -135,10 +135,14 @@ function _Statistiques(options) {
 		return occurences;
 	}
 
-	this.getNumberMessagePerUser = function(toSort, refetch) {
+	this.getNumberMessagePerUser = function(options) {
+		var options = options || {};
 		if (this.numberMessagePerUser !== null) return this.numberMessagePerUser;
-		if (typeof toSort === "undefined") toSort = true;
-		if (typeof toSorefetchrt !== "boolean") refetch = false;
+		if (typeof options.toSort === "undefined") toSort = true;
+		else toSort = options.toSort;
+		if (typeof options.refetch !== "boolean") refetch = false;
+		else refetch = options.refetch;
+
 		if (this.fetchedRows !== null && refetch === false) {
 			log.warn("get nb msg per user use fetchedRows")
 			var fetchedRows = this.fetchedRows;
@@ -276,6 +280,8 @@ function _Statistiques(options) {
 	}
 
 	this.getNumberCharacterPerMessagePerUser = function() {
+		if (this.numberCharacterPerMessagePerUser !== null) return this.numberCharacterPerMessagePerUser;
+		this.calculAll();
 		return this.numberCharacterPerMessagePerUser;
 	}
 
@@ -292,13 +298,18 @@ function _Statistiques(options) {
 		//desactivation des logs
 		log.setLevel(log.levels.DEBUG);
 
+
+
 		while (hours["hours.ISO"].$gte.getHours() < 23) {
 			this.betweenHours = hours;
 			total = 0;
 
 			delete this.numberMessagePerUser;
 			this.numberMessagePerUser = null; //force recalcul
-			numberMessagePerUser = this.getNumberMessagePerUser(false, true);
+			numberMessagePerUser = this.getNumberMessagePerUser({
+				toSort: false,
+				refetch: true
+			});
 
 			_.each(this.enumName, function(name) {
 				if (typeof messagePerUserTimeline[name] !== "object") {
@@ -323,6 +334,13 @@ function _Statistiques(options) {
 		return messagePerUserTimeline;
 	}
 
+	/**
+	 * calcul :
+	 * totalContentPerUser
+	 * numberCharacterPerMessagePerUser
+	 * statNumberMessagePerUser
+	 * @return {[type]} [description]
+	 */
 	this.calculAll = function() {
 		var betweenDate = this.betweenDate;
 		var ref = this.ref;
@@ -389,20 +407,21 @@ function _Statistiques(options) {
 
 /*** AOP **/
 Statistiques = function(options) {
-	var initAop = (typeof options.initAop !== "undefined")? options.initAop : true
-	//to match old way
+	var options = options || {};
+	var initAop = (typeof options.initAop !== "undefined") ? options.initAop : true
+		//to match old way
 	if (typeof options !== "object") {
 		var calculAll = calculAll || false;
 	} else {
-		var calculAll = options.calculAll || false;
+		var calculAll = (typeof options.calculAll !== "undefined") ? options.calculAll : true;
 	}
 	var ref = options.ref || null;
 
 	var statistique = new _Statistiques({
 		calculAll: false, //false pour laisser le temps à l'aop d'etre init
 		ref: ref
-	}); 
-	if(!initAop){
+	});
+	if (!initAop) {
 		if (calculAll) {
 			statistique.setAll();
 		}

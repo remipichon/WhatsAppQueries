@@ -73,6 +73,7 @@ Test.prototype.drawHightcharts = function(){
 Test.prototype.getFromLocalStorage = function(conversationName){
     var statistique = JSON.parse(localStorage.getItem("sample"));
     var statMethods = new Statistiques({ref:"NOTHING",calculAll:false,initAop:false});
+    statistique.numberMessagePerUser = null;
 
     //re-add methods which are lost after being serialized
     var arrayProperties = Object.getOwnPropertyNames(statMethods);
@@ -89,9 +90,10 @@ Test.prototype.getFromLocalStorage = function(conversationName){
 
 Test.prototype.statistiqueInLocalStorage = function(conversationName){
     localStorage.removeItem(conversationName);
-    var st = new Statistiques({ref:conversationName,calculAll:true, initAop:false}); 
+    var st = new Statistiques({ref:conversationName,calculAll:true}); 
+    st.getMessagePerUserTimeline();
     localStorage.setItem(conversationName,JSON.stringify(st));
-
+    log.trace("Done");
 }
 
 

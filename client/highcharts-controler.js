@@ -2,6 +2,12 @@ HighchartsService = function() {}
 
 HighchartsService.prototype.drawUserBarChart = function(statistique) {
 
+    //perharps the user or Worker will help
+    var enumName = statistique.getEnumName();
+    var numberMessagePerUser = statistique.getNumberMessagePerUser();
+    // var numberCharacterPerMessagePerUser = statistique.getNumberCharacterPerMessagePerUser();
+    var totalContentPerUser = statistique.getTotalContentPerUser();
+
     var $chart = $('#user-bar-chart');
     if (typeof $chart.highcharts() !== "undefined") $chart.highcharts().destroy();
     $chart.highcharts({
@@ -12,7 +18,7 @@ HighchartsService.prototype.drawUserBarChart = function(statistique) {
             text: 'Messages and content per user'
         },
         xAxis: {
-            categories: statistique.getEnumName()
+            categories: enumName
 
         },
         yAxis: [{
@@ -20,10 +26,10 @@ HighchartsService.prototype.drawUserBarChart = function(statistique) {
             title: {
                 text: 'Messages'
             }
-        }, {
+        /*}, {
             title: {
                 text: 'Content per message'
-            },
+            },*/
         }, {
             title: {
                 text: 'Content (nb caracters)'
@@ -45,30 +51,32 @@ HighchartsService.prototype.drawUserBarChart = function(statistique) {
         series: [{
             name: 'Messages sent',
             color: 'rgba(165,170,217,.7)',
-            data: _.values(statistique.getNumberMessagePerUser()),
+            data: _.values(numberMessagePerUser),
             pointPadding: 0.2,
             pointPlacement: -0.2,
             yAxis: 0
         }, {
-            name: 'Content per message typed',
+           /* name: 'Content per message typed',
             color: 'rgba(209, 50, 144, 0.7)',
-            data: _.values(statistique.getNumberCharacterPerMessagePerUser()),
+            data: _.values(numberCharacterPerMessagePerUser),
             pointPadding: 0.3,
             pointPlacement: -0.2,
             yAxis: 1
-        }, {
+        }, {*/
             name: 'Content typed',
             color: 'rgba(126,86,134,.7)',
-            data: _.values(statistique.getTotalContentPerUser()),
+            data: _.values(totalContentPerUser),
             pointPadding: 0.4,
             pointPlacement: -0.2,
-            yAxis: 2
+            yAxis: 1
         }]
     });
 }
 
 
 HighchartsService.prototype.drawContentUserPieChart = function(statistique) {
+
+    var statContentMessagePerUser = statistique.getStatContentMessagePerUser()
 
     var $chart = $('#user-content-pie-chart');
     if (typeof $chart.highcharts() !== "undefined") $chart.highcharts().destroy();
@@ -101,7 +109,7 @@ HighchartsService.prototype.drawContentUserPieChart = function(statistique) {
         series: [{
             type: 'pie',
             name: 'Number caracteres sent',
-            data: _.map(statistique.getStatContentMessagePerUser(), function(num, key) {
+            data: _.map(statContentMessagePerUser, function(num, key) {
                 return [key, num];
             })
         }]
@@ -110,6 +118,8 @@ HighchartsService.prototype.drawContentUserPieChart = function(statistique) {
 
 
 HighchartsService.prototype.drawMessageUserPieChart = function(statistique) {
+
+    var statNumberMessagePerUser = statistique.getStatNumberMessagePerUser();
 
     var $chart = $('#user-message-pie-chart');
     if (typeof $chart.highcharts() !== "undefined") $chart.highcharts().destroy();
@@ -143,7 +153,7 @@ HighchartsService.prototype.drawMessageUserPieChart = function(statistique) {
         series: [{
             type: 'pie',
             name: 'Messages sent',
-            data: _.map(statistique.getStatNumberMessagePerUser(), function(num, key) {
+            data: _.map(statNumberMessagePerUser, function(num, key) {
                 return [key, num];
             })
         }]
@@ -215,7 +225,9 @@ HighchartsService.prototype.drawHighcharts = function(statistique) {
 
 HighchartsService.prototype.initDrawHighcharts = function() {
 
-    statistique = new Statistiques(false);
+    statistique = new Statistiques({
+        calculAll:false,
+    });
 
     var endDate = datetimepicker.findOne({
         type: "endDate"
@@ -243,7 +255,7 @@ HighchartsService.prototype.initDrawHighcharts = function() {
         }
     };
 
-    //statistique.setAll();
+    statistique.setAll();
     log.info("HighchartsService.initDrawHighcharts statistique", statistique);
     HighchartsService.prototype.drawHighcharts(statistique);
 }
