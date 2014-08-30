@@ -9,7 +9,7 @@
 </body>
 
 <template name="modalFile">
-  <div class="modal fade" id="modal-file" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div id="modal-file" class="modal fade" data-keyboard="true" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
@@ -27,7 +27,7 @@
                     <input type="text" class="form-control" id="conversation-name" placeHolder="Enter an existing conversation name">
                   </div> 
                 </div>
-              </div>
+              </div>   <!-- end panel -->
               <div class="panel panel-default">
                 <div class="panel-heading"><label>Or upload one of yours</label></div>
                 <div class="panel-body">
@@ -40,17 +40,29 @@
                     <input type="text" class="form-control" id="new-conversation-name" placeHolder="Enter a non existing conversation name">
                   </div> 
                 </div>
-              </div>
+              </div>  <!-- end panel -->
+              <div id="panel-parse-file-progress-bar" class="panel panel-default" style="display:none;">
+                  <div class="panel-heading"><label>Reading your file...</label></div>
+                  <div class="panel-body">
+                    <div class="form-group">
+                      <div class="progress">
+                        <div id="parse-file-progress-bar" class="progress-bar progress-bar-striped active"  role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
+                          <span class="sr-only_"><span>0</span>% Complete</span>
+                        </div>
+                      </div>
+                    </div> 
+                  </div>
+                </div> <!-- end panel -->
+              </div>  <!-- end col -->
             </div>
           </div>            
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary">Continue</button>
+          <button type="button" id="modal-file-close" class="btn btn-default" data-dismiss="modal">Close</button>
+          <button type="button" id="modal-file-continue" class="btn btn-primary">Continue</button>
         </div>
       </div>
     </div>
-  </div>
 </template>
 
 <template name="containerCharts">

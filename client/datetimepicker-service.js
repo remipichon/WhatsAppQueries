@@ -200,7 +200,10 @@ $(document).ready(function() {
 	initDatePicker();
 	initTimePicker();
 	$("#draw-button").on("click", HighchartsService.prototype.initDrawHighcharts);
-	test.drawHightcharts();
+ 	$("#modal-file-continue").one("click", loadFileFromModal); 
+ 	log.setLevel("trace");
+
+	// test.drawHightcharts("sample");
 });
 
 

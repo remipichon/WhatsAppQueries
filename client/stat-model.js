@@ -1,4 +1,5 @@
 Data = new Meteor.Collection("data");
+Statistiques = new Meteor.Collection("statistique");
 
 Object.size = function(obj) {
 	var size = 0,
@@ -213,7 +214,7 @@ function _Statistiques(options) {
 			}
 
 			_.each(userRows, function(record) {
-				tot += record.content.length;
+				tot += ((typeof record.content === "number")? record.content : record.content.length);
 			});
 
 			occurences[userName] = tot;
@@ -366,7 +367,7 @@ function _Statistiques(options) {
 			//content per user
 			var tot = 0;
 			_.each(rowsName, function(record) { //for each row (message) of an userName
-				tot += record.content.length;
+				tot += ((typeof record.content === "number")? record.content : record.content.length);
 			});
 			totalContentPerUser[userName] = tot;
 

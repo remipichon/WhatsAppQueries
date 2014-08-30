@@ -21,6 +21,10 @@
 }
 
 
+#user-bar-chart {
+	min-height: 800px;
+}
+
 
 /**
  * https://github.com/twbs/bootstrap/issues/11292

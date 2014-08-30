@@ -63,15 +63,15 @@ Test.prototype.analyseStatistiqueTimeline = function() {
 }
 
 
-Test.prototype.drawHightcharts = function() {
-    var st = Test.prototype.getFromLocalStorage("sample");
+Test.prototype.drawHightcharts = function(filename) {
+    var st = Test.prototype.getFromLocalStorage(filename);
 
 
     HighchartsService.prototype.drawHighcharts(st);
 }
 
 Test.prototype.getFromLocalStorage = function(conversationName) {
-    var statistique = JSON.parse(localStorage.getItem("sample"));
+    var statistique = JSON.parse(localStorage.getItem(conversationName));
     var statMethods = new Statistiques({
         ref: "NOTHING",
         calculAll: false,

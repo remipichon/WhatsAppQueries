@@ -50,7 +50,7 @@ HighchartsService.prototype.drawUserBarChart = function(statistique) {
             },
         series: [{
             name: 'Messages sent',
-            color: 'rgba(165,170,217,.7)',
+            color: 'rgba(124, 181, 236,0.7)',
             data: _.values(numberMessagePerUser),
             pointPadding: 0.2,
             pointPlacement: -0.2,
@@ -64,7 +64,7 @@ HighchartsService.prototype.drawUserBarChart = function(statistique) {
             yAxis: 1
         }, {*/
             name: 'Content typed',
-            color: 'rgba(126,86,134,.7)',
+            color: 'rgba(144, 237, 125,0.7);',
             data: _.values(totalContentPerUser),
             pointPadding: 0.4,
             pointPlacement: -0.2,
