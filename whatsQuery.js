@@ -158,7 +158,14 @@
      $("#parse-file-progress-bar span").html("Complete");
      $("#modal-file-continue").removeAttr("disabled");
      $("#modal-file").one("click", function() {
-      $( this ).off( event );
+       $("#parse-file-progress-bar").css("width", "0%");
+       $("#parse-file-progress-bar span").html("0%");
+       $("#panel-parse-file-progress-bar").fadeOut(200);
+     $("#modal-file-close").removeAttr("disabled");
+
+       $("#new-conversation-name").val("");
+       $("#fileToUpload").val("");
+       $(this).off(event);
        $(this).modal('hide');
        $("#modal-file-continue").one("click", loadFileFromModal);
 
