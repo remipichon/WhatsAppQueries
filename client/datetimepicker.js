@@ -87,9 +87,6 @@ datetimepicker.insert({
 	type: "endHours",
 	hours: new Date(1970, 1, 1, 23, 59, 59, 999)
 });
-
-
-
 datetimepicker.find({}).observeChanges({
 	changed: function() {
 
@@ -104,7 +101,9 @@ datetimepicker.find({}).observeChanges({
 	}
 });
 
-initDatePicker = function() {
+DatetimePickerService = function(){}
+
+DatetimePickerService.prototype.initDatePicker = function() {
 	jQuery('#date_timepicker_start').datetimepicker({
 		format: 'Y/m/d',
 		timepicker: false,
@@ -149,7 +148,7 @@ initDatePicker = function() {
 }
 
 
-initTimePicker = function() {
+DatetimePickerService.prototype.initTimePicker = function() {
 	jQuery('#hour_timepicker_start').datetimepicker({
 		format: 'H:i',
 		datepicker: false,
@@ -196,15 +195,14 @@ initTimePicker = function() {
 }
 
 
-$(document).ready(function() {
-	initDatePicker();
-	initTimePicker();
-	$("#draw-button").on("click", HighchartsService.prototype.initDrawHighcharts);
- 	$("#modal-file-continue").one("click", loadFileFromModal); 
- 	log.setLevel("trace");
+// must be after adding methods to prototype
+Aop.around("", function(f) { 
+    log.trace( " AOPbefore DatetimePickerService." + f.fnName, "called with", ((arguments[0].arguments.length == 0) ? "no args" : arguments[0].arguments));
+    var retour = Aop.next(f,DatetimePickerService.prototype); //mandatory
+    log.trace( " AOPafter DatetimePickerService." + f.fnName, "which returned", retour);
+    return retour; //mandatory
+}, [DatetimePickerService.prototype]);
 
-	// test.drawHightcharts("sample");
-});
 
 
 

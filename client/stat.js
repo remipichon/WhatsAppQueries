@@ -1,5 +1,7 @@
 Data = new Meteor.Collection("data");
-Statistiques = new Meteor.Collection("statistique");
+Statistique = new Meteor.Collection("statistique");
+
+
 
 Object.size = function(obj) {
 	var size = 0,
@@ -10,13 +12,19 @@ Object.size = function(obj) {
 	return size;
 };
 
-
-function _Statistiques(options) {
-	var calculAll = options.calculAll || false;
-	this.ref = "sample";
-	this.ref = "spam_libre";
-	this.ref = "sample_big";
+/**
+ * ref is mandatory !
+ * @param  {[type]} options [description]
+ * @return {[type]}         [description]
+ */
+function _StatistiqueService(options) {
+	if(typeof options.calculAll !== "boolean") calculAll = false;
+	else calculAll = options.calculAll;
 	this.ref = options.ref || prompt("converstion name ?");
+	if (this.ref === null || this.ref === "") {
+		log.error("Statistique : options.ref is mandatory");
+		return;
+	}
 	log.info("Statistique with ", this.ref);
 	this.betweenDate = DatetimePicker.prototype.infinityDate();
 	this.betweenHours = DatetimePicker.prototype.infinityHours();
@@ -47,7 +55,7 @@ function _Statistiques(options) {
 		var temp = {};
 		var cont = true;
 		var nb = Object.size(ob)
-		log.debug("Statistiques.sortObject object.length", nb, ob);
+		log.debug("StatistiqueService.sortObject object.length", nb, ob);
 		while (nb !== 0) {
 			cont = true;
 			var min = 10000000;
@@ -214,7 +222,7 @@ function _Statistiques(options) {
 			}
 
 			_.each(userRows, function(record) {
-				tot += ((typeof record.content === "number")? record.content : record.content.length);
+				tot += ((typeof record.content === "number") ? record.content : record.content.length);
 			});
 
 			occurences[userName] = tot;
@@ -367,7 +375,7 @@ function _Statistiques(options) {
 			//content per user
 			var tot = 0;
 			_.each(rowsName, function(record) { //for each row (message) of an userName
-				tot += ((typeof record.content === "number")? record.content : record.content.length);
+				tot += ((typeof record.content === "number") ? record.content : record.content.length);
 			});
 			totalContentPerUser[userName] = tot;
 
@@ -386,14 +394,14 @@ function _Statistiques(options) {
 
 
 	this.setAll = function(callback) {
-		log.info("Statistiques.setAll : starting ...")
+		log.info("StatistiqueService.setAll : starting ...")
 		this.fetchesRows();
 		this.getNumberTotalMessage();
 		this.getEnumName();
 		this.getNumberMessagePerUser();
 		this.sortEnumName();
 		this.calculAll();
-		log.info("Statistiques.setAll : end")
+		log.info("StatistiqueService.setAll : end")
 
 		if (typeof callback === "function") {
 			callback.call(this);
@@ -403,11 +411,85 @@ function _Statistiques(options) {
 	if (calculAll) {
 		this.setAll();
 	}
+
+	/**
+	 * return an object of all attributes
+	 * @return {[type]} [description]
+	 */
+	this.getAttributes = function() {
+		var attr = {};
+		var arrayProperties = Object.getOwnPropertyNames(this);
+		for (var id = 0; id < arrayProperties.length; id++) {
+			var property = arrayProperties[id];
+			if (typeof this[property] !== "function") {
+				attr[property] = this[property];
+			}
+		}
+		delete attr.betweenDate;
+		delete attr.betweenHours;
+		return attr;
+	}
+
+	this.create = function() {
+		if (Conversation.findOne({
+			name: this.ref
+		}).hasStat === true) {
+			log.error("A statistique already exists");
+			return;
+		}
+		var dataSt = this.getAttributes();
+		return Statistique.insert(
+			dataSt
+		);
+	}
+
+	/**
+	 * charge les statistques déjà calculée
+	 * @param  {Meteor.collection} collection collection which contains statistques (null if never calculated)
+	 */
+	this.read = function(callback) {
+		var dataAttribute = Statistique.findOne({
+			name: this.ref
+		});
+
+		this.enumName = dataAttribute.enumName;
+		this.numberMessagePerUser = dataAttribute.numberMessagePerUser;
+		this.totalContentPerUser = dataAttribute.totalContentPerUser;
+		this.totalMessageContent = dataAttribute.totalMessageContent;
+		this.numberTotalMessage = dataAttribute.numberTotalMessage;
+		this.statNumberMessagePerUser = dataAttribute.statNumberMessagePerUser;
+		this.statContentMessagePerUser = dataAttribute.statContentMessagePerUser;
+		this.numberCharacterPerMessagePerUser = dataAttribute.numberCharacterPerMessagePerUser;
+		this.messagePerUserTimeline = dataAttribute.messagePerUserTimeline;
+		this.fetchedRows = dataAttribute.fetchedRows;
+	}
+
+	/**
+	 * update all fields to this.ref conversation's statistique. (server only it if previsouly null)
+	 * @param  {Function} callback [description]
+	 * @return {[type]}            [description]
+	 */
+	this.update = function(callback) {
+		if (Conversation.findOne({
+			name: this.ref
+		}).hasStat === true) {
+			log.error("A statistique is already set : you can't udpate an already calculated statistique");
+			return;
+		}
+		var dataSt = this.getAttributes();
+		return StatistiqueStored.update({
+			_id: Statistique.findOne({
+				name: this.ref
+			})._id
+		}, {
+			$set: dataSt
+		});
+	}
 }
 
 
-/*** AOP **/
-Statistiques = function(options) {
+/*** AOP by RemiP**/
+StatistiqueService = function(options) {
 	var options = options || {};
 	var initAop = (typeof options.initAop !== "undefined") ? options.initAop : true
 		//to match old way
@@ -418,7 +500,7 @@ Statistiques = function(options) {
 	}
 	var ref = options.ref || null;
 
-	var statistique = new _Statistiques({
+	var statistique = new _StatistiqueService({
 		calculAll: false, //false pour laisser le temps à l'aop d'etre init
 		ref: ref
 	});
@@ -426,7 +508,7 @@ Statistiques = function(options) {
 		if (calculAll) {
 			statistique.setAll();
 		}
-		log.trace("Statistiques : skip AOP");
+		log.trace("StatistiqueService : skip AOP");
 		return statistique
 	}
 	var arrayProperties = Object.getOwnPropertyNames(statistique);
@@ -437,10 +519,9 @@ Statistiques = function(options) {
 				log.info("add AOP on", property)
 				var old = statistique[property];
 				statistique[property] = function() {
-					log.trace(" AOPbefore Statistiques." + property, "called with", arguments);
-					//log.trace( : AOPbefore Statistiques." + property, "called with this.hours", this.betweenHours);
+					log.trace(" AOPbefore StatistiqueService." + property, "called with", arguments);
 					var retour = old.apply(statistique, arguments);
-					log.trace("AOPafter Statistiques." + property, "which returned", retour);
+					log.trace("AOPafter StatistiqueService." + property, "which returned", retour);
 					return retour;
 				}
 			})(statistique, property);

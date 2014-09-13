@@ -32,7 +32,8 @@ Aop = {
     }
   },
 
-  next: function(f) {
-    return f.fn.apply(this, f.arguments);
+  // next: function(f) {
+  next: function(f,self) {
+    return f.fn.apply(self || this, f.arguments);
   }
 };

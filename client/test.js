@@ -4,7 +4,7 @@ Test.prototype.analyseStatistique = function() {
     var date = new Date();
     var name = "analyseStatistique_" + date.getFullYear() + "." + date.getMonth() + "." + date.getDate() + "-" + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
 
-    var stat = new Statistiques(false);
+    var stat = new StatistiqueService(false);
 
     log.debug("Test.analyseStatistique : start profile");
     console.profile(name);
@@ -36,7 +36,7 @@ Test.prototype.analyseStatistiqueTimeline = function() {
     var date = new Date();
     var name = "analyseStatistique_" + date.getFullYear() + "." + date.getMonth() + "." + date.getDate() + "-" + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
 
-    var stat = new Statistiques(false);
+    var stat = new StatistiqueService(false);
 
     log.debug("Test.analyseStatistique getMessagePerUserTimeline : start profile");
     console.profile(name);
@@ -72,7 +72,7 @@ Test.prototype.drawHightcharts = function(filename) {
 
 Test.prototype.getFromLocalStorage = function(conversationName) {
     var statistique = JSON.parse(localStorage.getItem(conversationName));
-    var statMethods = new Statistiques({
+    var statMethods = new StatistiqueService({
         ref: "NOTHING",
         calculAll: false,
         initAop: false
@@ -94,7 +94,7 @@ Test.prototype.getFromLocalStorage = function(conversationName) {
 
 Test.prototype.statistiqueInLocalStorage = function(conversationName, timeline) {
     localStorage.removeItem(conversationName);
-    var st = new Statistiques({
+    var st = new StatistiqueService({
         ref: conversationName,
         calculAll: true
     });
@@ -117,3 +117,54 @@ Test.prototype.statistiqueInLocalStorage = function(conversationName, timeline) 
 
 
 test = new Test();
+
+
+/*
+Rien = function() {
+    this.logger = function() {
+        console.log("rien");
+    }
+
+
+    this.fn = function() {
+        this.logger();
+    }
+}
+
+
+// must be after adding methods to prototype
+Aop.around("", function(f) {
+    //arguments[0].arguments[0] += 10;      
+    log.trace(" AOPbefore DatetimePickerService" + f.fnName, "called with", ((arguments[0].arguments.length == 0) ? "no args" : arguments[0].arguments));
+    var retour = Aop.next(f); //mandatory
+    log.trace(" AOPafter DatetimePickerService" + f.fnName, "which returned", retour);
+    return retour; //mandatory
+}, [Rien]);
+*/
+
+/*
+Autre = function() {
+    this.attr = 34;
+}
+
+Autre.prototype.fn = function() {
+    this.logger();
+}
+
+Autre.prototype.logger = function() {
+    console.log("rien");
+}
+
+// must be after adding methods to prototype
+Aop.around("", function(f) {
+    //arguments[0].arguments[0] += 10;      
+    log.debug(" AOPbefore DatetimePickerService" + f.fnName, "called with", ((arguments[0].arguments.length == 0) ? "no args" : arguments[0].arguments));
+    var retour = Aop.next(f,Autre.prototype); //mandatory
+    log.debug(" AOPafter DatetimePickerService" + f.fnName, "which returned", retour);
+    return retour; //mandatory
+}, [Autre.prototype]);
+
+Autre.prototype.fn();
+a = new Autre(); a.fn();
+
+*/

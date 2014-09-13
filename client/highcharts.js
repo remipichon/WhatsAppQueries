@@ -212,7 +212,7 @@ HighchartsService.prototype.drawMessageBarChartTimeline = function(statistique) 
 
 HighchartsService.prototype.drawHighcharts = function(statistique) {
 
-    if (!statistique instanceof Statistiques) {
+    if (!statistique instanceof StatistiqueService) {
         return log.error("drawHighcharts : not statistique args");
     }
     var highchartsService = new HighchartsService();
@@ -226,7 +226,7 @@ HighchartsService.prototype.drawHighcharts = function(statistique) {
 
 HighchartsService.prototype.initDrawHighcharts = function() {
 
-    statistique = new Statistiques({
+    statistique = new StatistiqueService({
         calculAll:false,
     });
 
@@ -262,10 +262,9 @@ HighchartsService.prototype.initDrawHighcharts = function() {
 }
 
 // must be after adding methods to prototype
-Aop.around("", function(f) {
-    //arguments[0].arguments[0] += 10;      
+Aop.around("", function(f) {   
     log.trace( " AOPbefore HighchartsService." + f.fnName, "called with", ((arguments[0].arguments.length == 0) ? "no args" : arguments[0].arguments));
-    var retour = Aop.next(f); //mandatory
+    var retour = Aop.next(f,HighchartsService.prototype); //mandatory
     log.trace( " AOPafter HighchartsService." + f.fnName, "which returned", retour);
     return retour; //mandatory
 }, [HighchartsService.prototype]);
