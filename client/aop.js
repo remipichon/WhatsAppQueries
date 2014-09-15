@@ -1,6 +1,5 @@
-/*
- * from : http://fredrik.appelberg.me/2010/05/07/aop-js.html
- */
+// Created by Fredrik Appelberg: http://fredrik.appelberg.me/2010/05/07/aop-js.html
+// Modified to support prototypes by Dave Clayton
 
 
 Aop = {
@@ -36,4 +35,24 @@ Aop = {
   next: function(f,self) {
     return f.fn.apply(self || this, f.arguments);
   }
+};
+
+
+Aop.before = function(pointcut, advice, namespaces) {
+  Aop.around(pointcut,
+             function(f) {
+               advice.apply(this, f.arguments);
+               return Aop.next.call(this, f);
+             },
+             namespaces);
+};
+
+Aop.after = function(pointcut, advice, namespaces) {
+  Aop.around(pointcut,
+             function(f) {
+               var ret = Aop.next.call(this, f);
+               advice.apply(this, f.arguments);
+               return ret;
+             },
+             namespaces);
 };

@@ -1,7 +1,7 @@
  //deprecated or for future use
  getFile = function(filename, conversationName, add) {
    if (typeof filename === "undefined") {
-     throw new Error("parseFile :  filename required");
+     throw new Error("parseRows :  filename required");
 
    }
 
@@ -19,7 +19,7 @@
    HTTP.get("http://192.168.1.54:3000/" + filename, function(err, result) {
      var rows = result.content.split("\n");
      if (rows[0] === "<!DOCTYPE html>") {
-       log.error("parseFile : file", filename, "was not found");
+       log.error("parseRows : file", filename, "was not found");
        return -1;
      }
      var options = {
@@ -28,12 +28,19 @@
        add: true,
        rows: rows
      }
-     parseFile(options);
+     parseRows(options); //WILL NOT WORK
    });
  }
 
+
  if (Meteor.isClient) {
+
    Meteor.startup(function() {
+
+     
+
+
+
      $(document).ready(function() {
        log.setLevel("trace");
        //parce que les trace prennent trop de place dans la console
@@ -45,9 +52,9 @@
        DatetimePickerService.prototype.initDatePicker();
        DatetimePickerService.prototype.initTimePicker();
        $("#draw-button").on("click", HighchartsService.prototype.initDrawHighcharts);
-       $("#modal-file-continue").one("click", ConversationHelper.prototype.loadFileFromModal);
+       $("#modal-file-continue").one("click", ModalControler.prototype.loadFileFromModal);
        //init jQuery autocomplete
-       $("#modal-file #conversation-name").click(ConversationHelper.prototype.initAutocompleteConversationName);
+       $("#modal-file #conversation-name").click(ModalControler.prototype.initAutocompleteConversationName);
        // test.drawHightcharts("sample");
      });
    })

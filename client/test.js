@@ -115,6 +115,13 @@ Test.prototype.statistiqueInLocalStorage = function(conversationName, timeline) 
     log.trace("Done");
 }
 
+Test.prototype.deleteAll = function(conversationName){
+     Meteor.call("deleteAll", conversationName, null/*Meteor.userId()*/, function(error, result) {
+        log.info("deleteAll done", Conversation.find({}).fetch.length, Data.find({}).fetch().length, Statistique.find({}).fetch().length);
+     });
+}
+
+
 
 test = new Test();
 

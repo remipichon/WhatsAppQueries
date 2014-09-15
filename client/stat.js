@@ -1,6 +1,7 @@
 Data = new Meteor.Collection("data");
 Statistique = new Meteor.Collection("statistique");
-
+DataSubscription = null;
+StatistiqueSubscription = null;
 
 
 Object.size = function(obj) {
@@ -20,7 +21,7 @@ Object.size = function(obj) {
 function _StatistiqueService(options) {
 	if(typeof options.calculAll !== "boolean") calculAll = false;
 	else calculAll = options.calculAll;
-	this.ref = options.ref || prompt("converstion name ?");
+	this.ref = options.ref || ((typeof Conversation.findOne({}) === "undefined")? null : Conversation.findOne({}).name);
 	if (this.ref === null || this.ref === "") {
 		log.error("Statistique : options.ref is mandatory");
 		return;
