@@ -1,8 +1,8 @@
-Template.modalFile.getCurrentConversationName = function() {
+Template.containerCharts.getCurrentConversationName = function() {
   if (typeof Conversation.findOne({}) === "undefined") {
-    return "Click me !";
+    return "Feel free to click me !";
   }
-  return
+  return Conversation.findOne({}).name;
 }
 
 ModalControler = function() {}
@@ -59,7 +59,6 @@ ModalControler.prototype.loadFileFromModal = function(event) {
 
   //ask for subscription to add data
   ConversationHelper.prototype.getConversationDataStatistique(conversationName, true, function() {
-
 
     //then check if conversationName doesn't already exists
     Meteor.call("getExistingConversationName", function(error, result) {
@@ -152,7 +151,8 @@ ModalControler.prototype.initAutocompleteConversationName = function() {
     }
     log.info("getExistingConversationName init autocompelte with", result);
     $("#modal-file #conversation-name").autocomplete({
-      source: result
+      source: result,
+      position: { my : "right top", at: "right bottom" } 
     });
   });
 }

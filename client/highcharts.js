@@ -219,12 +219,12 @@ HighchartsService.prototype.drawHighcharts = function(statistique) {
     highchartsService.drawUserBarChart(statistique);
     highchartsService.drawMessageUserPieChart(statistique);
     highchartsService.drawContentUserPieChart(statistique);
-    highchartsService.drawMessageBarChartTimeline(statistique);
-
+   highchartsService.drawMessageBarChartTimeline(statistique);
 }
 
 
 HighchartsService.prototype.initDrawHighcharts = function() {
+    delete statistique;
 
     statistique = new StatistiqueService({
         calculAll:false,

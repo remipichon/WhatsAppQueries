@@ -1,5 +1,6 @@
 Data = new Meteor.Collection("data");
 Statistique = new Meteor.Collection("statistique");
+statistique = null; //will store the StatistiqueService currently drawn
 DataSubscription = null;
 StatistiqueSubscription = null;
 
@@ -19,9 +20,9 @@ Object.size = function(obj) {
  * @return {[type]}         [description]
  */
 function _StatistiqueService(options) {
-	if(typeof options.calculAll !== "boolean") calculAll = false;
+	if (typeof options.calculAll !== "boolean") calculAll = false;
 	else calculAll = options.calculAll;
-	this.ref = options.ref || ((typeof Conversation.findOne({}) === "undefined")? null : Conversation.findOne({}).name);
+	this.ref = options.ref || ((typeof Conversation.findOne({}) === "undefined") ? null : Conversation.findOne({}).name);
 	if (this.ref === null || this.ref === "") {
 		log.error("Statistique : options.ref is mandatory");
 		return;
@@ -385,7 +386,6 @@ function _StatistiqueService(options) {
 
 			//number characters per message per user
 			numberCharacterPerMessagePerUser[userName] = totalContentPerUser[userName] / numberMessagePerUser[userName]
-
 		});
 
 		this.numberCharacterPerMessagePerUser = numberCharacterPerMessagePerUser;
@@ -395,6 +395,7 @@ function _StatistiqueService(options) {
 
 
 	this.setAll = function(callback) {
+		this.read();
 		log.info("StatistiqueService.setAll : starting ...")
 		this.fetchesRows();
 		this.getNumberTotalMessage();
@@ -402,7 +403,13 @@ function _StatistiqueService(options) {
 		this.getNumberMessagePerUser();
 		this.sortEnumName();
 		this.calculAll();
-		log.info("StatistiqueService.setAll : end")
+		log.info("StatistiqueService.setAll : end");
+
+		//we only want to store statistique based on the whole data
+		//if (this.betweenDate['date.ISO'].$gte == DatetimePicker.prototype.infinityDate()['date.ISO'].$gte &&
+		//	this.betweenHours['date.ISO'].$gte == DatetimePicker.prototype.infinityHours()['date.ISO'].$gte) {
+		this.update();
+		//}
 
 		if (typeof callback === "function") {
 			callback.call(this);
@@ -449,20 +456,30 @@ function _StatistiqueService(options) {
 	 * @param  {Meteor.collection} collection collection which contains statistques (null if never calculated)
 	 */
 	this.read = function(callback) {
-		var dataAttribute = Statistique.findOne({
+		if (Conversation.findOne({
 			name: this.ref
+		}).hasStat === false) {
+			log.warn("StatistiqueService.read : A statistique is not already set : you can't read a not calculated statistique");
+			return;
+		}
+		var dataAttribute = Statistique.findOne({
+			ref: this.ref
 		});
 
-		this.enumName = dataAttribute.enumName;
-		this.numberMessagePerUser = dataAttribute.numberMessagePerUser;
-		this.totalContentPerUser = dataAttribute.totalContentPerUser;
-		this.totalMessageContent = dataAttribute.totalMessageContent;
-		this.numberTotalMessage = dataAttribute.numberTotalMessage;
-		this.statNumberMessagePerUser = dataAttribute.statNumberMessagePerUser;
-		this.statContentMessagePerUser = dataAttribute.statContentMessagePerUser;
-		this.numberCharacterPerMessagePerUser = dataAttribute.numberCharacterPerMessagePerUser;
-		this.messagePerUserTimeline = dataAttribute.messagePerUserTimeline;
-		this.fetchedRows = dataAttribute.fetchedRows;
+		var arrayProperties = Object.getOwnPropertyNames(this);
+		for (var id = 0; id < arrayProperties.length; id++) {
+			var property = arrayProperties[id];
+			if (typeof this[property] !== "function") {
+				if (typeof dataAttribute[property] === "undefined") {
+					log.warn("StatistiqueService.read :", property, "doesn't exist in the database");
+					continue;
+				}
+				this[property] = dataAttribute[property];
+			}
+		}
+
+		this.betweenDate = DatetimePicker.prototype.infinityDate();
+		this.betweenHours = DatetimePicker.prototype.infinityHours();
 	}
 
 	/**
@@ -474,16 +491,27 @@ function _StatistiqueService(options) {
 		if (Conversation.findOne({
 			name: this.ref
 		}).hasStat === true) {
-			log.error("A statistique is already set : you can't udpate an already calculated statistique");
+			log.warn("StatistiqueService.update : A statistique is already set : you can't udpate an already calculated statistique");
 			return;
 		}
+
 		var dataSt = this.getAttributes();
-		return StatistiqueStored.update({
+		Statistique.update({
 			_id: Statistique.findOne({
-				name: this.ref
+				ref: this.ref
 			})._id
 		}, {
 			$set: dataSt
+		});
+
+		Conversation.update({
+			_id: Conversation.findOne({
+				name: this.ref
+			})._id
+		}, {
+			$set: {
+				hasStat: true
+			}
 		});
 	}
 }

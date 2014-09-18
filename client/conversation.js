@@ -24,13 +24,13 @@ ConversationHelper.prototype.parseRows = function(options) {
   var nbRows = rows.length;
   var cpt = 0;
   var names = [];
-  var minDate, maxDate,tempDate;
+  var minDate, maxDate, tempDate;
 
   _.each(rows, function(row) {
     if (row.length === 0) return;
 
     var now = new Date();
-    var deltaD = null;    //
+    var deltaD = null; //
     var deltaM = null;
     var deltaH = null;
 
@@ -64,14 +64,14 @@ ConversationHelper.prototype.parseRows = function(options) {
 
 
     tempDate = {
-        day: row.substring(0, 2),
-        month: row.substring(2 + deltaD, 6 + deltaD),
-        hour: row.substring(10 + deltaM + deltaD + deltaH, 12 + deltaM + deltaD + deltaH),
-        minutes: row.substring(13 + deltaM + deltaD + deltaH, 15 + deltaM + deltaD + deltaH),
-      };
+      day: row.substring(0, 2),
+      month: row.substring(2 + deltaD, 6 + deltaD),
+      hour: row.substring(10 + deltaM + deltaD + deltaH, 12 + deltaM + deltaD + deltaH),
+      minutes: row.substring(13 + deltaM + deltaD + deltaH, 15 + deltaM + deltaD + deltaH),
+    };
 
     //is the row a multiple row ?  and are we found number of
-    if (isMultiple || isNaN(tempDate.day) || isNaN(tempDate.hour) || isNaN(tempDate.minutes)){
+    if (isMultiple || isNaN(tempDate.day) || isNaN(tempDate.hour) || isNaN(tempDate.minutes)) {
       var content = row;
       isMultiple = false;
       //we use previous metadata
@@ -92,7 +92,7 @@ ConversationHelper.prototype.parseRows = function(options) {
       date: date,
       hours: hours,
       userName: userName,
-      content: content.length,  //here we only store length of the content, which means number of characters. This code should never be on the server for privacy purpose
+      content: content.length, //here we only store length of the content, which means number of characters. This code should never be on the server for privacy purpose
       reference: conversationName
     });
 
@@ -120,15 +120,18 @@ ConversationHelper.prototype.parseRows = function(options) {
       toDisplay = cpt;
     }
 
-
-    if (toDisplay !== null) {
-      log.info("parseRows", filename, toDisplay, "on", nbRows, row);
-      //update bootstrap progress bar
-      if (Meteor.isClient) {
-        var toPrint = parseInt(toDisplay / nbRows * 100) + "%";
-        $("#parse-file-progress-bar").css("width", toPrint);
+    //update bootstrap progress bar
+    if (Meteor.isClient) {
+      if (cpt / nbRows * 100 === parseInt(cpt / nbRows * 100)) {
+        var toPrint = parseInt(cpt / nbRows * 100) + "%";
+        log.info("parseRows",toPrint,"-",cpt,"on",nbRows);
+          $("#parse-file-progress-bar").css("width", toPrint);
         $("#parse-file-progress-bar span").html(toPrint);
       }
+    }
+
+    if (toDisplay !== null) {
+      //log.info("parseRows", filename, toDisplay, "on", nbRows, row);
     }
   });
 
@@ -166,11 +169,11 @@ ConversationHelper.prototype.create = function(name, userList, minDate, maxDate,
  * honnete ce n'est pas sa place ici, je fais pas trop ou la mettre
  * @param  {string} conversationName
  */
-ConversationHelper.prototype.getConversationDataStatistique = function(conversationName, prematureSub,callback) {
-    if(typeof prematureSub === "function") callback = prematureSub; 
-    else if(typeof prematureSub !== "boolean") prematureSub = false; 
+ConversationHelper.prototype.getConversationDataStatistique = function(conversationName, prematureSub, callback) {
+  if (typeof prematureSub === "function") callback = prematureSub;
+  else if (typeof prematureSub !== "boolean") prematureSub = false;
 
-  Meteor.call("getConversation", conversationName,  null /*Meteor.userId()*/ , prematureSub, function(error, result) {
+  Meteor.call("getConversation", conversationName, null /*Meteor.userId()*/ , prematureSub, function(error, result) {
     if (typeof error !== "undefined") {
       log.error("getConversationDataStatistique : get error ", error);
       return;
@@ -196,6 +199,20 @@ ConversationHelper.prototype.getConversationDataStatistique = function(conversat
 
   });
 }
+
+
+ConversationHelper.prototype.setHasStat = function(hasStat,statistique){
+  Conversation.update({
+      _id: Conversation.findOne({
+        name: statistique.ref
+      })._id
+    }, {
+      $set: {
+        hasStat: hasStat
+      }
+    });
+}
+    
 
 
 Aop.around("", function(f) {

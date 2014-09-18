@@ -56,6 +56,9 @@
        //init jQuery autocomplete
        $("#modal-file #conversation-name").click(ModalControler.prototype.initAutocompleteConversationName);
        // test.drawHightcharts("sample");
+       
+       //don't why I have to do this
+       $("#filename").css("cursor","pointer");
      });
    })
  }

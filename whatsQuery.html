@@ -14,7 +14,7 @@
       <div class="modal-content">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-          <h4 class="modal-title" id="myModalLabel">{{getCurrentConversationName}} </h4>
+          <h4 class="modal-title" id="myModalLabel">Choose a conversation</h4>
         </div>
         <div class="modal-body">
           <div class="row" id="form-conversation-filename">
@@ -69,14 +69,14 @@
 
   <div id="gears-area" class="container">
     <div class="row">
-      <div class="col-md-3 col-xs-12">
+      <div class="col-lg-3 col-md-12 col-xs-12">
           <div class="row">
               <div id="filename" class="text-center col-md-12"  
                         data-toggle="modal" data-target="#modal-file"> 
-                        <h3>Click me !</h3> </div>
+                        <h3>{{getCurrentConversationName}}</h3> </div>
           </div>
       </div>
-      <div class="clearfix visible-xs-block"></div>
+      <div class="clearfix visible-xs-block visible-sm-block"></div>
       <div class="col-md-9">
         <div class="row">
           <div class="col-md-3 col-sm-6 col-xs-12 text-center-md  text-right-sm  text-right-xs">

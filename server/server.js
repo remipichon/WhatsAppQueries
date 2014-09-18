@@ -74,6 +74,7 @@
  		Data.remove({});
  		Statistique.remove({});
  		Conversation.remove({});
+ 		log.info("deleteAll : done");
  	}
 
 
