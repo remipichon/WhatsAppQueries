@@ -9,7 +9,7 @@
 </body>
 
 <template name="modalFile">
-  <div id="modal-file" class="modal fade" data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div id="modal-file" class="modal fade container" data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
@@ -19,29 +19,35 @@
         <div class="modal-body">
           <div class="row" id="form-conversation-filename">
             <div class="col-md-10 col-md-offset-1">
-              <div class="panel panel-default">
+              <div class="panel panel-default">  <!-- panel : load existing -->
                 <div class="panel-heading"><label>Select an existing one</label></div>
                 <div class="panel-body">
-                  <div class="form-group">
-                    <label class="sr-only">Select an existing one </label>
-                    <input type="text" class="form-control" id="conversation-name" placeHolder="Enter an existing conversation name">
+                   <div class="form-group has-feedback">
+                      <label class="control-label" for="conversation-name">Type the name of your conversation</label>
+                      <input type="text" class="form-control" id="conversation-name" placeHolder="Enter an existing conversation name">    
+                      <span class="sucess-icon glyphicon glyphicon-ok form-control-feedback"></span>
+                      <span class="error-icon glyphicon glyphicon-ban-circle form-control-feedback"></span>
+                      <div class="loading-icon small spinner-progress form-control-feedback"><div>Loading…</div></div>
                   </div> 
                 </div>
-              </div>   <!-- end panel -->
-              <div class="panel panel-default">
+              </div>   <!-- end panel : load existing-->
+              <div class="panel panel-default">  <!-- panel : create a new -->
                 <div class="panel-heading"><label>Or upload one of yours</label></div>
                 <div class="panel-body">
                   <div class="form-group">
                     <label class="sr-only">Or upload one of yours </label>
                     <input type="file" id="fileToUpload">
-                   </div> 
-                  <div class="form-group">
-                    <label>And choose a conversation name</label>
-                    <input type="text" class="form-control" id="new-conversation-name" placeHolder="Enter a non existing conversation name">
+                  </div> 
+                  <div class="form-group has-feedback">
+                      <label class="control-label" for="conversation-name">And choose a conversation name</label>
+                      <input type="text" class="form-control" id="new-conversation-name" placeHolder="Enter a non existing conversation name">    
+                      <span class="sucess-icon glyphicon glyphicon-ok form-control-feedback"></span>
+                      <span class="error-icon glyphicon glyphicon-ban-circle form-control-feedback"></span>
+                      <div class="loading-icon small spinner-progress form-control-feedback"><div>Loading…</div></div>
                   </div> 
                 </div>
-              </div>  <!-- end panel -->
-              <div id="panel-parse-file-progress-bar" class="panel panel-default" style="display:none;">
+              </div>  <!-- end panel : create a new-->
+              <div id="panel-parse-file-progress-bar" class="panel panel-default" style="display:none;"><!--  panel : progress bar -->
                   <div class="panel-heading"><label>Reading your file...</label></div>
                   <div class="panel-body">
                     <div class="form-group">
@@ -52,7 +58,7 @@
                       </div>
                     </div> 
                   </div>
-                </div> <!-- end panel -->
+                </div> <!-- end panel : progress bar-->
               </div>  <!-- end col -->
             </div>
           </div>            
@@ -66,7 +72,6 @@
 </template>
 
 <template name="containerCharts">
-
   <div id="gears-area" class="container">
     <div class="row">
       <div class="col-lg-3 col-md-12 col-xs-12">

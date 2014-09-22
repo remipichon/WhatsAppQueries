@@ -26,7 +26,10 @@ ConversationHelper.prototype.parseRows = function(options) {
   var names = [];
   var minDate, maxDate, tempDate;
 
-  _.each(rows, function(row) {
+  alert("The progress bar doesn't work. Open dev tools to see progress status (F12) )");
+  // _.each(rows, function(row) {
+    for(var i = 0; i<rows.length;i++){
+      row = rows[i];
     if (row.length === 0) return;
 
     var now = new Date();
@@ -125,18 +128,22 @@ ConversationHelper.prototype.parseRows = function(options) {
       if (cpt / nbRows * 100 === parseInt(cpt / nbRows * 100)) {
         var toPrint = parseInt(cpt / nbRows * 100) + "%";
         log.info("parseRows",toPrint,"-",cpt,"on",nbRows);
-          $("#parse-file-progress-bar").css("width", toPrint);
-        $("#parse-file-progress-bar span").html(toPrint);
+        var e1 = document.getElementById("e1");
+        e1.style.width = toPrint;
+        // $("#parse-file-progress-bar").css("width", toPrint);
+        // $("#parse-file-progress-bar span").html(toPrint);
+
       }
     }
 
     if (toDisplay !== null) {
       //log.info("parseRows", filename, toDisplay, "on", nbRows, row);
     }
-  });
+  // });
+  }
 
   log.info("parseRows", cpt, "from", filename, "into", conversationName);
-
+ 
   this.create(conversationName, names, minDate, maxDate, nbRows);
   var st = new StatistiqueService({
     ref: conversationName,

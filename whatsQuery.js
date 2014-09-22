@@ -47,14 +47,14 @@
        log.trace = function() {
          var args = Array.prototype.slice.call(arguments);
          args.unshift("TRACE : ");
-         log.debug.apply(this, args);
+         log.info.apply(this, args);
        }
        DatetimePickerService.prototype.initDatePicker();
        DatetimePickerService.prototype.initTimePicker();
        $("#draw-button").on("click", HighchartsService.prototype.initDrawHighcharts);
-       $("#modal-file-continue").one("click", ModalControler.prototype.loadFileFromModal);
-       //init jQuery autocomplete
-       $("#modal-file #conversation-name").click(ModalControler.prototype.initAutocompleteConversationName);
+
+      ModalControler.prototype.initModal();
+
        // test.drawHightcharts("sample");
        
        //don't why I have to do this

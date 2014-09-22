@@ -77,7 +77,7 @@
 
 
 /* cancel progress bar animation*/
-.progress .bar {
+.progress-bar {
     -webkit-transition: none;
     -moz-transition: none;
     -ms-transition: none;

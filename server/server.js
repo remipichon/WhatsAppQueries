@@ -11,7 +11,7 @@
 
  Meteor.methods({
  	getExistingConversationName: function() {
- 		var names = [];
+ 		var names = [];// ["",null,undefined];
  		var conv = Conversation.find({}, {
  			name: 1
  		}).fetch();

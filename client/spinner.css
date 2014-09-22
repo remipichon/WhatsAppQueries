@@ -1,0 +1,74 @@
+/**
+ * (C)Leanest CSS spinner ever
+ * http://lea.verou.me/2013/11/cleanest-css-spinner-ever/
+ */
+
+@-webkit-keyframes spin {
+	to { -webkit-transform: rotate(1turn); }
+}
+
+
+.spinner-wrapper {
+		border: 1px solid transparent;
+	border-radius: 4px;
+	border-color: #ccc;   /*TODO user LESS var instead*/
+	width: 30px;
+	height:30px;
+}
+
+.spinner-progress {
+	/*position: relative;*/
+
+
+	display: inline-block;
+	width: 5em;
+	height: 5em;
+	margin: 0 .5em;
+	font-size: 12px;
+	text-indent: 999em;
+	overflow: hidden;
+	-webkit-animation: spin 1s infinite steps(8);
+}
+
+.small.spinner-progress {
+	font-size: 6px;
+}
+
+.large.spinner-progress {
+	font-size: 24px;
+}
+
+.spinner-progress:before,
+.spinner-progress:after,
+.spinner-progress > div:before,
+.spinner-progress > div:after {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 2.25em; /* (container width - part width)/2  */
+	width: .5em;
+	height: 1.5em;
+	border-radius: .2em;
+	background: #eee;
+	box-shadow: 0 3.5em #eee; /* container height - part height */
+	-webkit-transform-origin: 50% 2.5em; /* container height / 2 */
+}
+
+.spinner-progress:before {
+	background: #555;
+}
+
+.spinner-progress:after {
+	-webkit-transform: rotate(-45deg);
+	background: #777;
+}
+
+.spinner-progress > div:before {
+	-webkit-transform: rotate(-90deg);
+	background: #999;
+}
+
+.spinner-progress > div:after {
+	-webkit-transform: rotate(-135deg);
+	background: #bbb;
+}
