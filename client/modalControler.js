@@ -87,7 +87,7 @@ ModalControler.prototype.loadFileFromModal = function(event) {
     //asked to server
     var conversationName = $("#conversation-name").val();
     log.info("loadFromModal : conversation asked to server");
-    $("#modal-file").one("click", resetModal);
+    $("#modal-file").one("click", ModalControler.prototype.resetModal);
     ConversationHelper.prototype.getConversationDataStatistique(conversationName);
     return;
   }

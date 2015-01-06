@@ -30,7 +30,7 @@ ConversationHelper.prototype.parseRows = function(options) {
   // _.each(rows, function(row) {
     for(var i = 0; i<rows.length;i++){
       row = rows[i];
-    if (row.length === 0) return;
+    if (row.length === 0) break;
 
     var now = new Date();
     var deltaD = null; //
@@ -150,6 +150,7 @@ ConversationHelper.prototype.parseRows = function(options) {
     calculAll: false
   });
   st.create();
+  ModalControler.prototype.resetModal();
 
 }
 

@@ -98,8 +98,8 @@ function _StatistiqueService(options) {
 			$and: [{
 					reference: this.ref
 				},
-				betweenDate,
-				betweenHours
+				//betweenDate,
+				//betweenHours
 			],
 		}).fetch(), function(row) {
 
@@ -130,8 +130,8 @@ function _StatistiqueService(options) {
 			$and: [{
 					reference: this.ref
 				},
-				this.betweenDate,
-				this.betweenHours
+				//this.betweenDate,
+				//this.betweenHours
 			]
 		}).fetch(), function(row) {
 			name = row.userName;
@@ -178,8 +178,8 @@ function _StatistiqueService(options) {
 						}, {
 							reference: ref
 						},
-						betweenDate,
-						betweenHours
+						//betweenDate,
+						//betweenHours
 					]
 				}).fetch().length;
 			}
@@ -217,8 +217,8 @@ function _StatistiqueService(options) {
 						}, {
 							reference: ref
 						},
-						betweenDate,
-						betweenHours
+						//betweenDate,
+						//betweenHours
 					]
 				}).fetch();
 			}
@@ -369,8 +369,8 @@ function _StatistiqueService(options) {
 					}, {
 						reference: ref
 					},
-					betweenDate,
-					betweenHours
+					//betweenDate,
+					//betweenHours
 				]
 			}).fetch();
 
@@ -439,12 +439,12 @@ function _StatistiqueService(options) {
 	}
 
 	this.create = function() {
-		if (Conversation.findOne({
-			name: this.ref
-		}).hasStat === true) {
-			log.error("A statistique already exists");
-			return;
-		}
+		//if (Conversation.findOne({
+		//	name: this.ref
+		//}).hasStat === true) {
+		//	log.error("A statistique already exists");
+		//	return;
+		//}
 		var dataSt = this.getAttributes();
 		return Statistique.insert(
 			dataSt
@@ -456,12 +456,13 @@ function _StatistiqueService(options) {
 	 * @param  {Meteor.collection} collection collection which contains statistques (null if never calculated)
 	 */
 	this.read = function(callback) {
-		if (Conversation.findOne({
-			name: this.ref
-		}).hasStat === false) {
-			log.warn("StatistiqueService.read : A statistique is not already set : you can't read a not calculated statistique");
-			return;
-		}
+		return;
+		//if (Conversation.findOne({
+		//	name: this.ref
+		//}).hasStat === false) {
+		//	log.warn("StatistiqueService.read : A statistique is not already set : you can't read a not calculated statistique");
+		//	return;
+		//}
 		var dataAttribute = Statistique.findOne({
 			ref: this.ref
 		});
@@ -527,7 +528,7 @@ StatistiqueService = function(options) {
 	} else {
 		var calculAll = (typeof options.calculAll !== "undefined") ? options.calculAll : true;
 	}
-	var ref = options.ref || null;
+	var ref = options.ref || Conversation.findOne().name || null;
 
 	var statistique = new _StatistiqueService({
 		calculAll: false, //false pour laisser le temps à l'aop d'etre init

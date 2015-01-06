@@ -228,6 +228,7 @@ HighchartsService.prototype.initDrawHighcharts = function() {
 
     statistique = new StatistiqueService({
         calculAll:false,
+        ref:Conversation.findOne().name
     });
 
     var endDate = datetimepicker.findOne({
