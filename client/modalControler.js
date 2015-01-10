@@ -143,7 +143,7 @@ ModalControler.prototype.loadFileFromModal = function(event) {
           $("#parse-file-progress-bar span").html("Complete");
           $("#modal-file-continue").removeAttr("disabled");
 
-          $("#modal-file").one("click", resetModal);
+          $("#modal-file").one("click", ModalControler.prototype.resetModal);
         };
 
         reader.onabort = function() {
@@ -201,7 +201,11 @@ ModalControler.prototype.resetModal = function() {
 
   $("#new-conversation-name").one("click", ModalControler.prototype.initInputNewConversationName);
 
-  $("#modal-file #conversation-name").autocomplete("destroy");
+  try{
+    $("#modal-file #conversation-name").autocomplete("destroy");
+  }catch (err) {
+     log.error(err);
+  }
 }
 
 ModalControler.prototype.isNameAvailable = function(coll, name) {
@@ -294,8 +298,8 @@ ModalControler.prototype.initInputNewConversationName = function() {
 
 
 Aop.around("", function(f) {
-  log.trace(" AOPbefore ModalControler." + f.fnName, "called with", ((arguments[0].arguments.length == 0) ? "no args" : arguments[0].arguments));
+  log.info(" AOPbefore ModalControler." + f.fnName, "called with", ((arguments[0].arguments.length == 0) ? "no args" : arguments[0].arguments));
   var retour = Aop.next(f, ModalControler.prototype); //mandatory
-  log.trace(" AOPafter ModalControler." + f.fnName, "which returned", retour);
+  log.info(" AOPafter ModalControler." + f.fnName, "which returned", retour);
   return retour; //mandatory
 }, [ModalControler.prototype]);
