@@ -101,6 +101,14 @@ ConversationHelper.prototype.parseRows = function (options) {
             var content = row.substring(header.length + 3, row.length);
         }
 
+        if(userName.indexOf("a rejoint") !== -1 ||
+            userName.indexOf("a quitté") !== -1 ||
+            userName.indexOf("à changé") !== -1
+        ){
+            log.info("parseRows","row skipped "+row);
+            continue;
+        }
+
 
         Data.insert({
             date: date,

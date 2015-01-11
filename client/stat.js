@@ -424,7 +424,8 @@ function _StatistiqueService(options) {
         this.getNumberMessagePerUser();
         this.sortEnumName();
         this.calculAll();
-        this.getMessagePerUserTimeline();
+        if(confirm("do you want to calcul the timelime ?\nIt's fucking looong"))
+            this.getMessagePerUserTimeline();
         log.info("StatistiqueService.setAll : end");
 
         //TODO repair this !
