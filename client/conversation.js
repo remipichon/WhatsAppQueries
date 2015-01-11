@@ -177,7 +177,7 @@ ConversationHelper.prototype.parseRows = function (options) {
 ConversationHelper.prototype.create = function (name, userList, minDate, maxDate, nbRows) {
     return Conversation.insert({
         name: name,
-        userList: userList,
+        //userList: userList,
         minDate: minDate,
         maxDate: maxDate,
         nbRows: nbRows
@@ -188,7 +188,7 @@ ConversationHelper.prototype.create = function (name, userList, minDate, maxDate
  * honnete ce n'est pas sa place ici, je fais pas trop ou la mettre
  * @param  {string} conversationName
  */
-ConversationHelper.prototype.getConversationDataStatistique = function (conversationName, prematureSub, callback) {
+ConversationHelper.prototype.getConversationDataStatistique = function (conversationName,getDataSub, prematureSub, callback) {
     if (typeof prematureSub === "function") callback = prematureSub;
     else if (typeof prematureSub !== "boolean") prematureSub = false;
 
@@ -207,7 +207,8 @@ ConversationHelper.prototype.getConversationDataStatistique = function (conversa
             ConversationSubscription.stop();
 
         //nouvelles sub
-        DataSubscription = Meteor.subscribe("data_" + conversationName);
+        if(getDataSub)
+            DataSubscription = Meteor.subscribe("data_" + conversationName);
         StatistiqueSubscription = Meteor.subscribe("statistique_" + conversationName);
         ConversationSubscription = Meteor.subscribe("conversation_" + conversationName);
 

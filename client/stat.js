@@ -344,7 +344,7 @@ function _StatistiqueService(options) {
                 total += parseInt(nbMessage || 0);
             }
             messagePerUserTimeline.total.push(total);
-            log.debug("getMessagePerUserTimeline ", hours["hours.ISO"].$gte.getHours()+"h to "+hours["hours.ISO"].$lt.getHours()+"h", "total", total);
+            log.debug("getMessagePerUserTimeline ", hours["hours.ISO"].$gte.getHours()+"h to "+hours["hours.ISO"].$lt.getHours()+1+"h", "total", total);
             if(hours["hours.ISO"].$gte.getHours() >= 23){
                 break;
             }
@@ -427,6 +427,7 @@ function _StatistiqueService(options) {
         this.getMessagePerUserTimeline();
         log.info("StatistiqueService.setAll : end");
 
+        //TODO repair this !
         //we only want to store statistique based on the whole data
         //if (this.betweenDate['date.ISO'].$gte == DatetimePicker.prototype.infinityDate()['date.ISO'].$gte &&
         //	this.betweenHours['date.ISO'].$gte == DatetimePicker.prototype.infinityHours()['date.ISO'].$gte) {
@@ -438,9 +439,7 @@ function _StatistiqueService(options) {
         }
 
 
-        if (calculAll) {
-            this.setAll();
-        }
+
     }
 
     /**
@@ -472,6 +471,94 @@ function _StatistiqueService(options) {
         return Statistique.insert(
             dataSt
         );
+    };
+
+    /**
+     * allow to purge enunName and rename user
+     */
+    /**
+     *
+     * @param username the user
+     */
+
+    /**
+     *
+     * @param oldUsername   username to rename
+     * @param username
+     *
+     * OR
+     * @param oldUsername   username to delete
+     */
+    this.cleanEnumName = function(oldUsername,username){
+        this.read();//just to be sure we have the latest data
+
+        if(typeof oldUsername !== "string"){
+            log.error("cleanEnumName","need a username to clean");
+            return -1;
+        }
+
+        if(this.enumName.indexOf(oldUsername) === -1){
+            log.error("cleanEnumName",oldUsername+" doesn't exists, pick another one");
+            return -1;
+        }
+
+        if(typeof username === "string") {
+            if(this.enumName.indexOf(username) !== -1){
+                log.error("cleanEnumName renameUser",username+" already exists, pick another one");
+                return -1;
+            }
+            return this._renameUser(oldUsername,username);
+        }else{
+            return this._removeUser(oldUsername);
+        }
+    };
+    this._removeUser = function(userName){
+        this.enumName.splice(this.enumName.indexOf(userName),1);
+        //this.enumName = this.sortEnumName(this.enumName);
+        delete this.numberMessagePerUser[userName];
+        delete this.totalContentPerUser[userName];
+        delete this.numberCharacterPerMessagePerUser[userName];
+        delete this.messagePerUserTimeline[userName];
+
+        //recalc (there are some ways to make it smarter but this is a magouiiille
+        this.numberTotalMessage = null;
+        this.totalMessageContent = null;
+        this.statNumberMessagePerUser = null;
+        this.statContentMessagePerUser = null;
+        //TODO substract all message from user deleted messagePerUserTimeline
+
+        Conversation.update({_id:Conversation.findOne()._id},{$set:{hasStat:false}}); //pour eviter de read a nouveau depuis la datanbase
+        this.setAll();
+
+        //Conversation.update({_id:Conversation.findOne()._id},{$set:{hasStat:false}})
+        //this.update();
+
+        return 1;
+
+    };
+    this._renameUser = function(oldUsername,userName){
+        this.enumName[this.enumName.indexOf(oldUsername)] = userName;
+
+        this.numberMessagePerUser[userName] = this.numberMessagePerUser[oldUsername];
+        delete this.numberMessagePerUser[oldUsername];
+
+        //this.numberMessagePerUser = this.sortObject(this.numberMessagePerUser);
+        //this.enumName = this.sortEnumName(this.enumName);
+
+        this.totalContentPerUser[userName] = this.totalContentPerUser[oldUsername];
+        delete this.totalContentPerUser[oldUsername];
+
+        this.numberCharacterPerMessagePerUser[userName] =  this.numberCharacterPerMessagePerUser[oldUsername];
+        delete this.numberCharacterPerMessagePerUser[oldUsername];
+
+        this.messagePerUserTimeline[userName] = this.messagePerUserTimeline[oldUsername];
+        delete this.messagePerUserTimeline[oldUsername];
+
+
+        Conversation.update({_id:Conversation.findOne()._id},{$set:{hasStat:false}})
+        this.update();
+
+        return 1;
     };
 
     /**
@@ -514,8 +601,11 @@ function _StatistiqueService(options) {
             }).hasStat === true) {
             log.warn("StatistiqueService.update : A statistique is already set : you can't udpate an already calculated statistique");
             var rep = prompt("A statistique is already set. \nYou can't udpate an already calculated statistique without a password");
-            if(rep !== "kiki")
-                return;
+            if(rep !== "kiki"){
+                log.info("StatistiqueService.update","not updated");
+                return -1;
+            }
+
         }
 
         var dataSt = this.getAttributes();
@@ -527,7 +617,10 @@ function _StatistiqueService(options) {
             $set: dataSt
         });
 
-        Conversation.update({
+        log.info("StatistiqueService.update","updated");
+
+
+        return Conversation.update({
             _id: Conversation.findOne({
                 name: this.ref
             })._id

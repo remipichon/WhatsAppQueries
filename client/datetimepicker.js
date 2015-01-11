@@ -197,9 +197,9 @@ DatetimePickerService.prototype.initTimePicker = function() {
 
 // must be after adding methods to prototype
 Aop.around("", function(f) { 
-    log.trace( " AOPbefore DatetimePickerService." + f.fnName, "called with", ((arguments[0].arguments.length == 0) ? "no args" : arguments[0].arguments));
+    log.info( " AOPbefore DatetimePickerService." + f.fnName, "called with", ((arguments[0].arguments.length == 0) ? "no args" : arguments[0].arguments));
     var retour = Aop.next(f,DatetimePickerService.prototype); //mandatory
-    log.trace( " AOPafter DatetimePickerService." + f.fnName, "which returned", retour);
+    log.info( " AOPafter DatetimePickerService." + f.fnName, "which returned", retour);
     return retour; //mandatory
 }, [DatetimePickerService.prototype]);
 

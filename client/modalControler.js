@@ -79,6 +79,7 @@ ModalControler.prototype.loadFileFromModal = function(event) {
   var conv = $("#conversation-name").val() !== "";
   var file = $("#fileToUpload").val() !== "";
   var newConv = $("#new-conversation-name").val() !== "";
+  var getDataSub = ($("#getDataSub:checked").length === 1)?true:false;
 
   if (!this._modalRightlyFilled(conv, file, newConv)) return;
 
@@ -88,7 +89,7 @@ ModalControler.prototype.loadFileFromModal = function(event) {
     var conversationName = $("#conversation-name").val();
     log.info("loadFromModal : conversation asked to server");
     $("#modal-file").one("click", ModalControler.prototype.resetModal);
-    ConversationHelper.prototype.getConversationDataStatistique(conversationName);
+    ConversationHelper.prototype.getConversationDataStatistique(conversationName,getDataSub);
     return;
   }
 
@@ -100,7 +101,7 @@ ModalControler.prototype.loadFileFromModal = function(event) {
   $("#panel-parse-file-progress-bar").fadeIn(300);
 
   //ask for subscription to add data
-  ConversationHelper.prototype.getConversationDataStatistique(conversationName, true, function() {
+  ConversationHelper.prototype.getConversationDataStatistique(conversationName, true,true, function() {
 
     //then check if conversationName doesn't already exists
     Meteor.call("getExistingConversationName", function(error, result) {
