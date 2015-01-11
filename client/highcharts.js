@@ -264,8 +264,8 @@ HighchartsService.prototype.initDrawHighcharts = function() {
 
 // must be after adding methods to prototype
 Aop.around("", function(f) {   
-    log.trace( " AOPbefore HighchartsService." + f.fnName, "called with", ((arguments[0].arguments.length == 0) ? "no args" : arguments[0].arguments));
+    log.info( " AOPbefore HighchartsService." + f.fnName, "called with", ((arguments[0].arguments.length == 0) ? "no args" : arguments[0].arguments));
     var retour = Aop.next(f,HighchartsService.prototype); //mandatory
-    log.trace( " AOPafter HighchartsService." + f.fnName, "which returned", retour);
+    log.info( " AOPafter HighchartsService." + f.fnName, "which returned", retour);
     return retour; //mandatory
 }, [HighchartsService.prototype]);

@@ -305,27 +305,49 @@ function _StatistiqueService(options) {
         //desactivation des logs
         log.setLevel(log.levels.DEBUG);
 
-
-        while (hours["hours.ISO"].$gte.getHours() < 25) {
-            this.betweenHours = hours;
+        var name;
+        var nbMessage;
+        var ref = this.ref;
+        while (true) {
+            //this.betweenHours = hours;
             total = 0;
 
-            delete this.numberMessagePerUser;
-            this.numberMessagePerUser = null; //force recalcul
-            numberMessagePerUser = this.getNumberMessagePerUser({
-                toSort: false,
-                refetch: true
-            });
+            //delete this.numberMessagePerUser;
+            //this.numberMessagePerUser = null; //force recalcul
+            //numberMessagePerUser = this.getNumberMessagePerUser({
+            //    toSort: false,
+            //    refetch: true
+            //});
 
-            _.each(this.enumName, function (name) {
+
+
+            for(var i = 0;i<this.enumName.length; i++){
+            //_.each(this.enumName, function (name) {
+                name =  this.enumName[i];
                 if (typeof messagePerUserTimeline[name] !== "object") {
                     messagePerUserTimeline[name] = [];
                 }
-                messagePerUserTimeline[name].push(numberMessagePerUser[name] || 0);
-                total += parseInt(messagePerUserTimeline[name][messagePerUserTimeline[name].length - 1]);
-            });
+                //pas de gain de temps....
+                nbMessage = Data.find({
+                    $and: [{
+                        userName: name
+                    }, {
+                        reference: ref
+                    },
+                        //betweenDate,
+                        hours
+                    ]
+                }).fetch().length;
+                messagePerUserTimeline[name].push(nbMessage || 0);
+
+                //messagePerUserTimeline[name].push(numberMessagePerUser[name] || 0);
+                total += parseInt(nbMessage || 0);
+            }
             messagePerUserTimeline.total.push(total);
-            log.debug("getMessagePerUserTimeline hour", hours["hours.ISO"].$gte.getHours(), "total", total);
+            log.debug("getMessagePerUserTimeline ", hours["hours.ISO"].$gte.getHours()+"h to "+hours["hours.ISO"].$lt.getHours()+"h", "total", total);
+            if(hours["hours.ISO"].$gte.getHours() >= 23){
+                break;
+            }
             hours = DatetimePicker.prototype.nextHour(hours);
         }
 
@@ -487,12 +509,14 @@ function _StatistiqueService(options) {
      * @return {[type]}            [description]
      */
     this.update = function (callback) {
-        //if (Conversation.findOne({
-        //        name: this.ref
-        //    }).hasStat === true) {
-        //    log.warn("StatistiqueService.update : A statistique is already set : you can't udpate an already calculated statistique");
-        //    return;
-        //}
+        if (Conversation.findOne({
+                name: this.ref
+            }).hasStat === true) {
+            log.warn("StatistiqueService.update : A statistique is already set : you can't udpate an already calculated statistique");
+            var rep = prompt("A statistique is already set. \nYou can't udpate an already calculated statistique without a password");
+            if(rep !== "kiki")
+                return;
+        }
 
         var dataSt = this.getAttributes();
         Statistique.update({
